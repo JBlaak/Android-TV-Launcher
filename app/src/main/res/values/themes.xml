@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="night_blue">#FF101224</color>
+
+    <style name="Theme.TvLauncher" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/night_blue</item>
+        <item name="android:windowShowWallpaper">false</item>
+    </style>
+</resources>

@@ -1,0 +1,18 @@
+[*.{kt,kts}]
+ktlint_code_style = intellij_idea
+ktlint_standard_no-single-line-block-comment = disabled
+ktlint_standard_class-naming = disabled
+ktlint_standard_property-naming = disabled
+ktlint_standard_function-naming = disabled
+ktlint_standard_filename = disabled
+ktlint_standard_discouraged-comment-location = disabled
+ktlint_standard_package-name = disabled
+ktlint_standard_comment-wrapping = disabled
+ktlint_standard_function-expression-body = disabled
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_name_count_to_use_star_import = 9999
+ij_kotlin_name_count_to_use_star_import_for_members = 9999
+ij_java_class_count_to_use_import_on_demand = 9999
+ij_java_names_count_to_use_import_on_demand = 9999
+ij_java_packages_to_use_import_on_demand = 9999
