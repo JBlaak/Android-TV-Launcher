@@ -17,8 +17,11 @@ dependencies {
     implementation(projects.weather)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.compose.animation)
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui)
+    implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.paparazzi)
     testImplementation(libs.googleTestParameterInjector)

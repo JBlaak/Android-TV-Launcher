@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">TV Launcher</string>
+    <string name="disney_plus" translatable="false">Disney+</string>
+    <string name="netflix" translatable="false">Netflix</string>
+    <string name="npo_live_channels" translatable="false">NPO 1 · NPO 2 · NPO 3 live</string>
+    <string name="npo_tv" translatable="false">NPO TV</string>
+    <string name="plex" translatable="false">Plex</string>
+    <string name="series_and_films">Series &amp; films</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="your_library">Your library</string>
+    <string name="your_library_via_plezy">Your library · via Plezy</string>
+    <string name="youtube" translatable="false">YouTube</string>
 </resources>

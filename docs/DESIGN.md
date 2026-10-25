@@ -142,7 +142,6 @@ The direction of rain, snow, clouds and leaves follows the real wind, seen throu
 ## Still to do
 
 - Build at 1920×1080 with overscan-safe margins.
-- Moving focus with the remote's D-pad.
 - Long-press options menu on a tile.
 - Live weather.
-- A real Disney+ logo.
+- A bundled Disney+ logo. Until then the tile shows Disney+'s own TV banner from the system, or its name when there is none.

@@ -31,3 +31,8 @@ internal val Television = DeviceConfig(
     navigation = Navigation.DPAD,
     released = "2021",
 )
+
+internal enum class Locale(val tag: String) {
+    English("en"),
+    Dutch("nl"),
+}

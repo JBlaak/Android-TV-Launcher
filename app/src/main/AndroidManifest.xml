@@ -8,6 +8,15 @@
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
+    <queries>
+        <package android:name="tech.blaak.npotv" />
+        <package android:name="com.netflix.ninja" />
+        <package android:name="com.disney.disneyplus" />
+        <package android:name="com.edde746.plezy" />
+        <package android:name="com.plexapp.android" />
+        <package android:name="com.google.android.youtube.tv" />
+    </queries>
+
     <application
         android:banner="@drawable/banner"
         android:icon="@drawable/ic_launcher"
