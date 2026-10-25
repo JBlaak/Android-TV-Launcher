@@ -11,7 +11,7 @@ The dock, the weather pill and the Settings gear are frosted glass: the sky show
 We read the API ≤ 30 path of Haze 2.0.1 (`RenderScriptBlurVisualEffectDelegate`):
 
 - It records the content behind the glass into a scaled layer, renders that into an `ImageReader` surface, and blurs it with `ScriptIntrinsicBlur` in a coroutine. Until a new blur is ready it draws the previous output. So it's always at least one frame behind anything that moves, and here the sky moves every frame while the sun is up.
-- Every changed frame is a GPU → CPU → GPU round trip. On a 32-bit MediaTek TV, RenderScript intrinsics may run on the CPU.
+- Every changed frame is drawn into a RenderScript `Allocation` surface and awaited before the blur runs. On a 32-bit MediaTek TV, RenderScript intrinsics may run on the CPU.
 - RenderScript has been deprecated since API 31.
 - Haze picks the path from `Build.VERSION.SDK_INT`. On the API 31 emulator it always uses `RenderEffect`, so its Android 11 path can't be seen, let alone measured, without the TV.
 
