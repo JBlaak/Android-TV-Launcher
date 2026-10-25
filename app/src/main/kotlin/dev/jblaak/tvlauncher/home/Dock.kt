@@ -4,7 +4,14 @@ import android.view.KeyEvent.KEYCODE_DPAD_CENTER
 import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.KeyEvent.KEYCODE_NUMPAD_ENTER
 import android.view.ViewConfiguration
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,10 +32,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -37,11 +47,14 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.input.key.KeyEventType
@@ -58,6 +71,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -107,11 +122,18 @@ private fun RowScope.DockTile(
     onOpen: () -> Unit,
 ) {
     val focus by animateFloatAsState(if (focused) 1f else 0f, tween(300), label = "tile focus")
+    val move = tile.app.logoMove()
+    val sinceFocus = rememberSinceFocus(focused, maxOf(move.durationMillis, TileBounceMillis))
     val shape = RoundedCornerShape(19.5.dp)
     Box(
         modifier = Modifier
             .weight(1f + 0.7f * focus)
             .height(93.dp)
+            .graphicsLayer {
+                val scale = tileBounceAt(sinceFocus.value.toInt())
+                scaleX = scale
+                scaleY = scale
+            }
             .dropShadow(
                 shape,
                 Shadow(radius = 18.dp, color = tile.colors.glow.copy(alpha = 0.67f * focus), spread = (-9).dp, offset = DpOffset(0.dp, 15.dp)),
@@ -123,8 +145,71 @@ private fun RowScope.DockTile(
             .focusable(),
         contentAlignment = Alignment.Center,
     ) {
-        TileLogo(logo = tile.logo, focus = focus)
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    val pose = move.poseAt(sinceFocus.value.toInt())
+                    rotationZ = pose.rotation
+                    scaleX = pose.scale
+                    scaleY = pose.scale
+                    translationX = pose.offsetX.toPx()
+                    alpha = pose.alpha
+                }
+                .then(if (focused && move == LogoMove.Sparkle) Modifier.sparkle(tile.logo) else Modifier),
+        ) {
+            TileLogo(logo = tile.logo, focus = focus)
+        }
     }
+}
+
+/**
+ * Milliseconds since this tile last gained focus, held at [settledMillis] once the moves are over. A tile that starts
+ * out focused doesn't move, so Home opens calm.
+ */
+@Composable
+private fun rememberSinceFocus(focused: Boolean, settledMillis: Int): Animatable<Float, AnimationVector1D> {
+    val sinceFocus = remember { Animatable(settledMillis.toFloat()) }
+    val isFocused by rememberUpdatedState(focused)
+    LaunchedEffect(settledMillis) {
+        snapshotFlow { isFocused }.drop(1).collectLatest { gained ->
+            if (gained) {
+                sinceFocus.snapTo(0f)
+                sinceFocus.animateTo(settledMillis.toFloat(), tween(settledMillis, easing = LinearEasing))
+            } else {
+                sinceFocus.snapTo(settledMillis.toFloat())
+            }
+        }
+    }
+    return sinceFocus
+}
+
+/**
+ * A light sweeping through the logo, over and over. It tints only the logo's own pixels: a cyan glint through a
+ * name, a softer white shine across a banner.
+ */
+@Composable
+private fun Modifier.sparkle(logo: TileLogo): Modifier {
+    val sweep by rememberInfiniteTransition(label = "sparkle").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2200, easing = EaseInOut)),
+        label = "sparkle sweep",
+    )
+    val glint = if (logo is TileLogo.Banner) Color.White.copy(alpha = 0.35f) else Color(0xFFA8ECFF)
+    return graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        .drawWithContent {
+            drawContent()
+            val center = size.width * (-0.7f + 2.4f * sweep)
+            val halfWidth = size.width * 0.25f
+            drawRect(
+                brush = Brush.linearGradient(
+                    listOf(Color.Transparent, glint, Color.Transparent),
+                    start = Offset(center - halfWidth, size.height * 0.4f),
+                    end = Offset(center + halfWidth, size.height * 0.6f),
+                ),
+                blendMode = BlendMode.SrcAtop,
+            )
+        }
 }
 
 @Composable
