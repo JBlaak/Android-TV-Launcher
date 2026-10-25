@@ -1,14 +1,19 @@
 package dev.jblaak.tvlauncher.home
 
+import dev.jblaak.tvlauncher.R
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 internal class HomeStateHolder(
     private val config: HomeConfig,
     private val installedApps: InstalledApps,
     private val lastOpenedApp: LastOpenedApp,
+    private val clock: Clock,
     private val listener: Events,
 ) {
 
@@ -16,7 +21,15 @@ internal class HomeStateHolder(
     val state: StateFlow<HomeState> = mutableState.asStateFlow()
 
     fun focus(app: App) {
-        mutableState.update { it.copy(focused = app) }
+        mutableState.update { it.copy(focused = app, gearFocused = false) }
+    }
+
+    fun focusSettings() {
+        mutableState.update { it.copy(gearFocused = true) }
+    }
+
+    fun leaveSettings() {
+        mutableState.update { it.copy(gearFocused = false) }
     }
 
     fun open(app: App) {
@@ -25,15 +38,48 @@ internal class HomeStateHolder(
         listener.appLaunchRequested(target.packageName)
     }
 
+    fun openSettings() {
+        listener.settingsRequested()
+    }
+
     fun returnHome() {
         mutableState.value = homeState()
+    }
+
+    /**
+     * Moves the clock on at the start of every minute, until cancelled.
+     */
+    suspend fun keepTime() {
+        while (true) {
+            val now = clock.now()
+            delay(now.until(now.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1), ChronoUnit.MILLIS))
+            val time = clock.now()
+            mutableState.update { it.copy(time = time.minute(), date = time.toLocalDate(), greeting = time.greeting()) }
+        }
     }
 
     private fun homeState(): HomeState {
         val tiles = config.apps.mapNotNull { it.tile() }
         val lastOpened = lastOpenedApp.get()
         val focused = tiles.firstOrNull { it.app == lastOpened } ?: tiles.firstOrNull()
-        return HomeState(tiles = tiles, focused = focused?.app)
+        val now = clock.now()
+        return HomeState(
+            tiles = tiles,
+            focused = focused?.app,
+            gearFocused = false,
+            time = now.minute(),
+            date = now.toLocalDate(),
+            greeting = now.greeting(),
+        )
+    }
+
+    private fun ZonedDateTime.minute() = toLocalTime().truncatedTo(ChronoUnit.MINUTES)
+
+    private fun ZonedDateTime.greeting(): Int = when (hour) {
+        in 0..5 -> R.string.good_night
+        in 6..11 -> R.string.good_morning
+        in 12..17 -> R.string.good_afternoon
+        else -> R.string.good_evening
     }
 
     private fun AppConfig.tile(): Tile? {
@@ -56,5 +102,7 @@ internal class HomeStateHolder(
 
     interface Events {
         fun appLaunchRequested(packageName: String)
+
+        fun settingsRequested()
     }
 }

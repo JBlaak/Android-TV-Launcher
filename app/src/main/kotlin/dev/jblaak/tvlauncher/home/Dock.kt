@@ -196,7 +196,7 @@ private fun Modifier.tileBackground(gradient: List<Color>, focus: Float): Modifi
 /**
  * OK opens the app when it's released after a short press. A long press does nothing.
  */
-private fun Modifier.opensOnPress(onOpen: () -> Unit): Modifier = onKeyEvent { event ->
+internal fun Modifier.opensOnPress(onOpen: () -> Unit): Modifier = onKeyEvent { event ->
     val confirm = event.key.nativeKeyCode in setOf(KEYCODE_DPAD_CENTER, KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER)
     if (!confirm) return@onKeyEvent false
     val native = event.nativeKeyEvent

@@ -25,4 +25,5 @@ dependencies {
 
     testImplementation(libs.paparazzi)
     testImplementation(libs.googleTestParameterInjector)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

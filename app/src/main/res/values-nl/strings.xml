@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="good_afternoon">Goedemiddag</string>
+    <string name="good_evening">Goedenavond</string>
+    <string name="good_morning">Goedemorgen</string>
+    <string name="good_night">Goedenacht</string>
     <string name="series_and_films">Series &amp; films</string>
+    <string name="settings">Instellingen</string>
+    <string name="settings_description">Netwerk, beeld, geluid en apps</string>
     <string name="subscriptions">Abonnementen</string>
     <string name="your_library">Je bibliotheek</string>
     <string name="your_library_via_plezy">Je bibliotheek · via Plezy</string>
