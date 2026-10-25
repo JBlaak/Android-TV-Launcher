@@ -39,6 +39,7 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun SkyBackground(
     scene: SkyScene,
+    celebration: Celebration?,
     appGlow: Color,
     modifier: Modifier,
 ) {
@@ -48,14 +49,16 @@ internal fun SkyBackground(
         return
     }
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(animating = scene.sun is Sun.Disc)
+    val seconds = skyTime(animating = scene.sun is Sun.Disc || celebration != null)
     val sunPaths = remember { SunPaths() }
+    val celebrationLayers = remember(celebration) { celebration?.let { CelebrationLayers(it) } }
     Canvas(modifier = modifier.fillMaxSize()) {
         @Suppress("TooGenericExceptionCaught")
         try {
             scale(size.width / 1280f, pivot = Offset.Zero) {
                 drawSky(scene.colors, glow)
                 drawSun(scene.sun, sunPaths, seconds.value)
+                celebrationLayers?.let { drawCelebration(it, seconds.value) }
             }
         } catch (exception: RuntimeException) {
             Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
@@ -130,5 +133,5 @@ private const val GLOW = 0.6
 @Preview(device = "id:tv_1080p")
 @Composable
 internal fun SkyBackgroundPreview() {
-    SkyBackground(scene = HomeState.previewValue.sky, appGlow = Color(0xFF4AA83F), modifier = Modifier.fillMaxSize())
+    SkyBackground(scene = HomeState.previewValue.sky, celebration = null, appGlow = Color(0xFF4AA83F), modifier = Modifier.fillMaxSize())
 }
