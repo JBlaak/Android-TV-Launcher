@@ -81,6 +81,28 @@ elevation (degrees). There's no flat black.
 - **Colour by elevation:** red-orange below 3°, warm 3–12°, near-white above that.
 - **Clouds:** with clouds, fog or rain, only a soft diffuse glow shows where the sun is.
 
+## Moon
+
+Added after v1. It's always on, like the sun: no setting, and it shows only when it's really in view.
+
+- **Position:** a low-precision lunar formula, accurate to about 1°:
+  - mean longitude, mean anomaly and argument of latitude
+  - the main 6.289° term for longitude and 5.128° for latitude
+  - converted to right ascension and declination, then elevation and azimuth for Enschede
+  - mapped to the screen with the same window projection as the sun (looking 270°, 8 px per degree, horizon at y = 600)
+- **Phase:** age = days since the new moon of 2000-01-06 18:14 UTC, modulo 29.530588853. Lit fraction = (1 − cos(2π · age / synodic)) / 2. It's waxing while age is under half a cycle.
+- **Drawing:**
+  - A 64 px disc: a faint dark full disc (earthshine) plus the lit part.
+  - The lit part is the bright limb as a semicircle, closed by an elliptical terminator with x-radius `24 · |1 − 2·lit|`.
+  - The lit side is the right while waxing and the left while waning, as seen from the northern hemisphere. The disc's tilt is ignored.
+  - A soft drop-shadow glow surrounds it.
+- **Visibility:** it's drawn when its elevation is > 0°, it's within the window's view and at least 3% is lit.
+- **By weather:**
+  - **Clear or warm:** full disc. At 55% opacity while the sun is up (the daytime moon).
+  - **Clouds:** disc at 45% opacity.
+  - **Rain, storm, snow or fog:** no disc. A soft glow at its position at night, scaled by the lit fraction.
+- **Example:** on 25–26 Oct 2026 (full moon) it enters the window from the left after about 01:00. At 03:00 it's high in the south-west (azimuth 242°, elevation 39°). It sinks toward due west by dawn.
+
 ## Weather
 
 Each weather type pulls the sky toward its own colours and adds a full-screen effect layer.
