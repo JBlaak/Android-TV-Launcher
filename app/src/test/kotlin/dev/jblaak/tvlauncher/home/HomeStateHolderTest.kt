@@ -5,14 +5,22 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.Sun
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeStateHolderTest {
 
     @Test
@@ -298,6 +306,293 @@ class HomeStateHolderTest {
     }
 
     @Test
+    fun `the clock shows the current time to the minute`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(21, 15, second = 42)))
+
+        /* Then */
+        assertEquals(LocalTime.of(21, 15), holder.state.value.time)
+    }
+
+    @Test
+    fun `the greeting is followed by the date`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(21, 15)))
+
+        /* Then */
+        assertEquals(LocalDate.of(2026, 10, 25), holder.state.value.date)
+    }
+
+    @Test
+    fun `the clock follows the time zone the tv is set to`() {
+        /* Given */
+        val clock = FakeClock(ZonedDateTime.of(2026, 10, 25, 23, 30, 0, 0, ZoneId.of("Europe/London")))
+
+        /* When */
+        val holder = createHolder(clock = clock)
+
+        /* Then */
+        assertEquals(LocalTime.of(23, 30), holder.state.value.time)
+    }
+
+    @Test
+    fun `just after midnight it says good night`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(0, 0)))
+
+        /* Then */
+        assertEquals(R.string.good_night, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `just before six in the morning it still says good night`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(5, 59)))
+
+        /* Then */
+        assertEquals(R.string.good_night, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from six in the morning it says good morning`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(6, 0)))
+
+        /* Then */
+        assertEquals(R.string.good_morning, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `just before noon it still says good morning`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(11, 59)))
+
+        /* Then */
+        assertEquals(R.string.good_morning, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from noon it says good afternoon`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(12, 0)))
+
+        /* Then */
+        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `just before six in the evening it still says good afternoon`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(17, 59)))
+
+        /* Then */
+        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from six in the evening it says good evening`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(18, 0)))
+
+        /* Then */
+        assertEquals(R.string.good_evening, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `just before midnight it still says good evening`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(at(23, 59)))
+
+        /* Then */
+        assertEquals(R.string.good_evening, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `the clock moves on when the next minute starts`() = runTest {
+        /* Given */
+        val clock = FakeClock(at(11, 59, second = 30))
+        val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
+
+        /* When */
+        clock.time = at(12, 0)
+        advanceTimeBy(30.seconds)
+        runCurrent()
+
+        /* Then */
+        assertEquals(LocalTime.of(12, 0), holder.state.value.time)
+    }
+
+    @Test
+    fun `the clock waits for the next minute before it moves on`() = runTest {
+        /* Given */
+        val clock = FakeClock(at(11, 59, second = 30))
+        val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
+
+        /* When */
+        clock.time = at(11, 59, second = 59)
+        advanceTimeBy(29.seconds)
+        runCurrent()
+
+        /* Then */
+        assertEquals(LocalTime.of(11, 59), holder.state.value.time)
+    }
+
+    @Test
+    fun `the greeting changes when the clock passes noon`() = runTest {
+        /* Given */
+        val clock = FakeClock(at(11, 59, second = 30))
+        val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
+
+        /* When */
+        clock.time = at(12, 0)
+        advanceTimeBy(30.seconds)
+        runCurrent()
+
+        /* Then */
+        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+    }
+
+    @Test
+    fun `returning home shows the current time straight away`() {
+        /* Given */
+        val clock = FakeClock(at(21, 15))
+        val holder = createHolder(clock = clock)
+
+        /* When */
+        clock.time = at(23, 40)
+        holder.returnHome()
+
+        /* Then */
+        assertEquals(LocalTime.of(23, 40), holder.state.value.time)
+    }
+
+    @Test
+    fun `the label row shows the focused app`() {
+        /* When */
+        val holder = createHolder()
+
+        /* Then */
+        assertEquals(FocusLabel(R.string.npo_tv, R.string.npo_live_channels), holder.state.value.label)
+    }
+
+    @Test
+    fun `the gear is not focused at first`() {
+        /* When */
+        val holder = createHolder()
+
+        /* Then */
+        assertEquals(false, holder.state.value.gearFocused)
+    }
+
+    @Test
+    fun `focusing the gear focuses it`() {
+        /* Given */
+        val holder = createHolder()
+
+        /* When */
+        holder.focusSettings()
+
+        /* Then */
+        assertEquals(true, holder.state.value.gearFocused)
+    }
+
+    @Test
+    fun `with the gear focused the label row describes the settings`() {
+        /* Given */
+        val holder = createHolder()
+
+        /* When */
+        holder.focusSettings()
+
+        /* Then */
+        assertEquals(FocusLabel(R.string.settings, R.string.settings_description), holder.state.value.label)
+    }
+
+    @Test
+    fun `with the gear focused no tile is focused`() {
+        /* Given */
+        val holder = createHolder()
+
+        /* When */
+        holder.focusSettings()
+
+        /* Then */
+        assertEquals(null, holder.state.value.focusedTile)
+    }
+
+    @Test
+    fun `leaving the gear returns to the tile focused before`() {
+        /* Given */
+        val holder = createHolder()
+        holder.focus(App.Plex)
+        holder.focusSettings()
+
+        /* When */
+        holder.leaveSettings()
+
+        /* Then */
+        assertEquals(App.Plex, holder.state.value.focusedTile)
+    }
+
+    @Test
+    fun `leaving the gear unfocuses it`() {
+        /* Given */
+        val holder = createHolder()
+        holder.focusSettings()
+
+        /* When */
+        holder.leaveSettings()
+
+        /* Then */
+        assertEquals(false, holder.state.value.gearFocused)
+    }
+
+    @Test
+    fun `focusing a tile unfocuses the gear`() {
+        /* Given */
+        val holder = createHolder()
+        holder.focusSettings()
+
+        /* When */
+        holder.focus(App.Netflix)
+
+        /* Then */
+        assertEquals(false, holder.state.value.gearFocused)
+    }
+
+    @Test
+    fun `returning home unfocuses the gear`() {
+        /* Given */
+        val holder = createHolder()
+        holder.focusSettings()
+
+        /* When */
+        holder.returnHome()
+
+        /* Then */
+        assertEquals(false, holder.state.value.gearFocused)
+    }
+
+    @Test
+    fun `opening the settings asks for the tv settings`() {
+        /* Given */
+        val events = RecordingEvents()
+        val holder = createHolder(listener = events)
+
+        /* When */
+        holder.openSettings()
+
+        /* Then */
+        assertEquals(1, events.settingsRequests)
+    }
+
+    @Test
     fun `before dawn the pill shows the sunrise`() {
         /* When */
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 5, 0)))
@@ -379,44 +674,37 @@ class HomeStateHolderTest {
     }
 
     @Test
-    fun `the sun moves on as time passes`() {
+    fun `the sun comes into view as the minutes pass`() = runTest {
         /* Given */
-        val clock = FakeClock(amsterdam(2026, 10, 25, 9, 0))
+        val clock = FakeClock(amsterdam(2026, 10, 25, 12, 59, second = 30))
         val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
 
         /* When */
         clock.time = amsterdam(2026, 10, 25, 17, 5)
-        holder.timePassed()
+        advanceTimeBy(30.seconds)
+        runCurrent()
 
         /* Then */
         assertTrue(holder.state.value.sky.sun is Sun.Disc)
     }
 
     @Test
-    fun `the pill moves on to the sunset once the sun is up`() {
+    fun `the pill moves on to the sunset once the sun is up`() = runTest {
         /* Given */
-        val clock = FakeClock(amsterdam(2026, 10, 25, 7, 0))
+        val clock = FakeClock(amsterdam(2026, 10, 25, 7, 29, second = 30))
         val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
 
         /* When */
         clock.time = amsterdam(2026, 10, 25, 7, 30)
-        holder.timePassed()
+        advanceTimeBy(30.seconds)
+        runCurrent()
 
         /* Then */
         assertEquals(R.string.sunset_time, holder.state.value.sunTime?.label)
-    }
-
-    @Test
-    fun `time passing keeps the focus where it is`() {
-        /* Given */
-        val holder = createHolder()
-        holder.focus(App.Plex)
-
-        /* When */
-        holder.timePassed()
-
-        /* Then */
-        assertEquals(App.Plex, holder.state.value.focused)
     }
 
     private fun HomeState.sunDisc(): Sun.Disc = sky.sun as Sun.Disc
@@ -426,20 +714,22 @@ class HomeStateHolderTest {
         assertTrue("expected $expected ±2 min, was $actual", difference <= Duration.ofMinutes(2))
     }
 
-    private fun amsterdam(year: Int, month: Int, day: Int, hour: Int, minute: Int): ZonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, 0, 0, ZoneId.of("Europe/Amsterdam"))
+    private fun amsterdam(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int = 0): ZonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, second, 0, ZoneId.of("Europe/Amsterdam"))
 
     private fun HomeState.tile(app: App): Tile = tiles.single { it.app == app }
+
+    private fun at(hour: Int, minute: Int, second: Int = 0): ZonedDateTime = ZonedDateTime.of(2026, 10, 25, hour, minute, second, 0, ZoneId.of("Europe/Amsterdam"))
 
     private fun createHolder(
         installedApps: InstalledApps = FakeInstalledApps(allPackages),
         lastOpenedApp: LastOpenedApp = FakeLastOpenedApp(),
+        clock: Clock = FakeClock(at(21, 15)),
         listener: HomeStateHolder.Events = RecordingEvents(),
-        clock: Clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)),
     ): HomeStateHolder = HomeStateHolder(
         config = HomeConfig.Enschede,
-        clock = clock,
         installedApps = installedApps,
         lastOpenedApp = lastOpenedApp,
+        clock = clock,
         listener = listener,
     )
 

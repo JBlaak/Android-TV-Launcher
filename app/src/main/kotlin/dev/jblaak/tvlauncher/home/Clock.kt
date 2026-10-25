@@ -2,6 +2,9 @@ package dev.jblaak.tvlauncher.home
 
 import java.time.ZonedDateTime
 
-internal fun interface Clock {
+/**
+ * The current time in the TV's own time zone.
+ */
+internal interface Clock {
     fun now(): ZonedDateTime
 }

@@ -46,4 +46,9 @@ internal class HomeSnapshotTests(
     fun `youtube focused`() {
         paparazzi.snapshot { HomePreview(App.YouTube) }
     }
+
+    @Test
+    fun `settings focused`() {
+        paparazzi.snapshot { HomeSettingsFocusedPreview() }
+    }
 }

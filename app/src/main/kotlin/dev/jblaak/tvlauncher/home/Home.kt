@@ -31,20 +31,30 @@ internal fun Home(
     state: HomeState,
     onFocus: (App) -> Unit,
     onOpen: (App) -> Unit,
+    onFocusSettings: () -> Unit,
+    onLeaveSettings: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
-    val focusedTile = state.tiles.firstOrNull { it.app == state.focused }
     Box(modifier = Modifier.fillMaxSize()) {
         SkyBackground(
             scene = state.sky,
-            appGlow = focusedTile?.colors?.glow ?: Color.Transparent,
+            appGlow = if (state.gearFocused) Color(0xFFB8C0D0) else state.tiles.firstOrNull { it.app == state.focused }?.colors?.glow ?: Color.Transparent,
             modifier = Modifier.fillMaxSize(),
         )
-        state.sunTime?.let { sunTime ->
-            WeatherPill(
-                sunTime = sunTime,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(horizontal = 68.25.dp, vertical = 48.dp),
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(horizontal = 54.dp, vertical = 48.dp),
+        ) {
+            TopRow(
+                time = state.time,
+                date = state.date,
+                greeting = state.greeting,
+                sunTime = state.sunTime,
+                gearFocused = state.gearFocused,
+                onFocusSettings = onFocusSettings,
+                onLeaveSettings = onLeaveSettings,
+                onOpenSettings = onOpenSettings,
             )
         }
         Column(
@@ -54,18 +64,17 @@ internal fun Home(
                 .padding(horizontal = 54.dp, vertical = 48.dp),
             verticalArrangement = Arrangement.spacedBy(16.5.dp),
         ) {
-            FocusedAppLabel(tile = focusedTile)
-            Dock(tiles = state.tiles, focused = state.focused, onFocus = onFocus, onOpen = onOpen)
+            FocusedAppLabel(label = state.label)
+            Dock(tiles = state.tiles, focused = state.focusedTile, onFocus = onFocus, onOpen = onOpen)
         }
     }
 }
 
 @Composable
-private fun FocusedAppLabel(tile: Tile?) {
+private fun FocusedAppLabel(label: FocusLabel?) {
     AnimatedContent(
-        targetState = tile,
+        targetState = label,
         transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(200)) },
-        contentKey = { it?.app },
         label = "focused app",
     ) { current ->
         Row(
@@ -93,13 +102,40 @@ private fun FocusedAppLabel(tile: Tile?) {
 internal fun HomePreview(
     @PreviewParameter(FocusedAppProvider::class) focused: App,
 ) {
-    Home(state = HomeState.previewValue.copy(focused = focused), onFocus = {}, onOpen = {})
+    Home(
+        state = HomeState.previewValue.copy(focused = focused),
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeSettingsFocusedPreview() {
+    Home(
+        state = HomeState.previewValue.copy(focused = App.Netflix, gearFocused = true),
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
 }
 
 @Preview(device = "id:tv_1080p")
 @Composable
 internal fun HomeNightPreview() {
-    Home(state = HomeState.nightPreviewValue, onFocus = {}, onOpen = {})
+    Home(
+        state = HomeState.nightPreviewValue,
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
 }
 
 internal class FocusedAppProvider : PreviewParameterProvider<App> {

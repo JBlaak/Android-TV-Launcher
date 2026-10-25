@@ -1,7 +1,9 @@
 package dev.jblaak.tvlauncher
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -20,9 +22,7 @@ import dev.jblaak.tvlauncher.home.Home
 import dev.jblaak.tvlauncher.home.HomeConfig
 import dev.jblaak.tvlauncher.home.HomeStateHolder
 import dev.jblaak.tvlauncher.home.LocalRendering
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class HomeActivity : ComponentActivity() {
 
@@ -31,12 +31,16 @@ class HomeActivity : ComponentActivity() {
     private val homeStateHolder by lazy {
         HomeStateHolder(
             config = HomeConfig.Enschede,
-            clock = buildClock(intent),
             installedApps = buildInstalledApps(installedApps),
             lastOpenedApp = SharedPreferencesLastOpenedApp(getSharedPreferences("home", Context.MODE_PRIVATE)),
+            clock = buildClock(intent),
             listener = object : HomeStateHolder.Events {
                 override fun appLaunchRequested(packageName: String) {
                     installedApps.launchIntent(packageName)?.let { startActivity(it) }
+                }
+
+                override fun settingsRequested() {
+                    startActivity(Intent(Settings.ACTION_SETTINGS))
                 }
             },
         )
@@ -47,17 +51,19 @@ class HomeActivity : ComponentActivity() {
         val rendering = buildRendering(intent)
         onBackPressedDispatcher.addCallback(this) {}
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                while (true) {
-                    delay(30.seconds)
-                    homeStateHolder.timePassed()
-                }
-            }
+            repeatOnLifecycle(Lifecycle.State.RESUMED) { homeStateHolder.keepTime() }
         }
         setContent {
             val state by homeStateHolder.state.collectAsState()
             CompositionLocalProvider(LocalRendering provides rendering) {
-                Home(state = state, onFocus = homeStateHolder::focus, onOpen = homeStateHolder::open)
+                Home(
+                    state = state,
+                    onFocus = homeStateHolder::focus,
+                    onOpen = homeStateHolder::open,
+                    onFocusSettings = homeStateHolder::focusSettings,
+                    onLeaveSettings = homeStateHolder::leaveSettings,
+                    onOpenSettings = homeStateHolder::openSettings,
+                )
             }
         }
     }
