@@ -321,7 +321,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(21, 15)))
 
         /* Then */
-        assertEquals(LocalDate.of(2026, 10, 25), holder.state.value.date)
+        assertEquals(LocalDate.of(2026, 10, 21), holder.state.value.date)
     }
 
     @Test
@@ -342,7 +342,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(0, 0)))
 
         /* Then */
-        assertEquals(R.string.good_night, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_night), holder.state.value.greeting)
     }
 
     @Test
@@ -351,7 +351,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(5, 59)))
 
         /* Then */
-        assertEquals(R.string.good_night, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_night), holder.state.value.greeting)
     }
 
     @Test
@@ -360,7 +360,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(6, 0)))
 
         /* Then */
-        assertEquals(R.string.good_morning, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_morning), holder.state.value.greeting)
     }
 
     @Test
@@ -369,7 +369,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(11, 59)))
 
         /* Then */
-        assertEquals(R.string.good_morning, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_morning), holder.state.value.greeting)
     }
 
     @Test
@@ -378,7 +378,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(12, 0)))
 
         /* Then */
-        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_afternoon), holder.state.value.greeting)
     }
 
     @Test
@@ -387,7 +387,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(17, 59)))
 
         /* Then */
-        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_afternoon), holder.state.value.greeting)
     }
 
     @Test
@@ -396,7 +396,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(18, 0)))
 
         /* Then */
-        assertEquals(R.string.good_evening, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_evening), holder.state.value.greeting)
     }
 
     @Test
@@ -405,7 +405,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(at(23, 59)))
 
         /* Then */
-        assertEquals(R.string.good_evening, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_evening), holder.state.value.greeting)
     }
 
     @Test
@@ -456,7 +456,7 @@ class HomeStateHolderTest {
         runCurrent()
 
         /* Then */
-        assertEquals(R.string.good_afternoon, holder.state.value.greeting)
+        assertEquals(Greeting.Plain(R.string.good_afternoon), holder.state.value.greeting)
     }
 
     @Test
@@ -794,7 +794,7 @@ class HomeStateHolderTest {
 
     private fun HomeState.tile(app: App): Tile = tiles.single { it.app == app }
 
-    private fun at(hour: Int, minute: Int, second: Int = 0): ZonedDateTime = ZonedDateTime.of(2026, 10, 25, hour, minute, second, 0, ZoneId.of("Europe/Amsterdam"))
+    private fun at(hour: Int, minute: Int, second: Int = 0): ZonedDateTime = ZonedDateTime.of(2026, 10, 21, hour, minute, second, 0, ZoneId.of("Europe/Amsterdam"))
 
     private fun createHolder(
         installedApps: InstalledApps = FakeInstalledApps(allPackages),

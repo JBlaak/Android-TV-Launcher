@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="almost_year">Almost %1$d</string>
     <string name="app_name" translatable="false">TV Launcher</string>
+    <string name="clocks_went_back">Clocks went back · enjoy the extra hour</string>
+    <string name="clocks_went_forward">Clocks went forward · an hour shorter night</string>
     <string name="disney_plus" translatable="false">Disney+</string>
+    <string name="fijne_koningsdag" translatable="false">Fijne Koningsdag</string>
     <string name="good_afternoon">Good afternoon</string>
     <string name="good_evening">Good evening</string>
     <string name="good_morning">Good morning</string>
     <string name="good_night">Good night</string>
     <string name="greeting_and_date" translatable="false">%1$s · %2$s</string>
+    <string name="happy_year">Happy %1$d</string>
     <string name="netflix" translatable="false">Netflix</string>
     <string name="npo_live_channels" translatable="false">NPO 1 · NPO 2 · NPO 3 live</string>
     <string name="npo_tv" translatable="false">NPO TV</string>

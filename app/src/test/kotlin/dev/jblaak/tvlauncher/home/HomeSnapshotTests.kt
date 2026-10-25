@@ -23,6 +23,16 @@ internal class HomeSnapshotTests(
     }
 
     @Test
+    fun `oud en nieuw`() {
+        paparazzi.snapshot { HomeNewYearsEvePreview() }
+    }
+
+    @Test
+    fun `koningsdag`() {
+        paparazzi.snapshot { HomeKingsDayPreview() }
+    }
+
+    @Test
     fun `npo tv focused`() {
         paparazzi.snapshot { HomePreview(App.NpoTv) }
     }

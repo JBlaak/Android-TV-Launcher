@@ -1,9 +1,11 @@
 package dev.jblaak.tvlauncher.home
 
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.Moment
 import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.SunEvent
+import dev.jblaak.tvlauncher.sky.moment
 import dev.jblaak.tvlauncher.sky.nextSunEvent
 import dev.jblaak.tvlauncher.sky.skyScene
 import kotlinx.coroutines.delay
@@ -64,6 +66,7 @@ internal class HomeStateHolder(
                     time = time.minute(),
                     date = time.toLocalDate(),
                     greeting = time.greeting(),
+                    celebration = time.celebration(),
                     sky = time.sky(),
                     sunTime = time.sunTime(),
                 )
@@ -83,6 +86,7 @@ internal class HomeStateHolder(
             time = now.minute(),
             date = now.toLocalDate(),
             greeting = now.greeting(),
+            celebration = now.celebration(),
             sky = now.sky(),
             sunTime = now.sunTime(),
         )
@@ -98,11 +102,26 @@ internal class HomeStateHolder(
 
     private fun ZonedDateTime.minute() = toLocalTime().truncatedTo(ChronoUnit.MINUTES)
 
-    private fun ZonedDateTime.greeting(): Int = when (hour) {
+    private fun ZonedDateTime.greeting(): Greeting = when (val moment = moment(this)) {
+        is Moment.NewYearsEve -> Greeting.WithYear(R.string.almost_year, moment.comingYear)
+        is Moment.NewYearsDay -> Greeting.WithYear(R.string.happy_year, moment.year)
+        Moment.KingsDay -> Greeting.Plain(R.string.fijne_koningsdag)
+        Moment.ClocksWentBack -> Greeting.Plain(R.string.clocks_went_back)
+        Moment.ClocksWentForward -> Greeting.Plain(R.string.clocks_went_forward)
+        null -> Greeting.Plain(timeOfDay())
+    }
+
+    private fun ZonedDateTime.timeOfDay(): Int = when (hour) {
         in 0..5 -> R.string.good_night
         in 6..11 -> R.string.good_morning
         in 12..17 -> R.string.good_afternoon
         else -> R.string.good_evening
+    }
+
+    private fun ZonedDateTime.celebration(): Celebration? = when (moment(this)) {
+        is Moment.NewYearsEve, is Moment.NewYearsDay -> Celebration.Fireworks
+        Moment.KingsDay -> Celebration.Bunting
+        Moment.ClocksWentBack, Moment.ClocksWentForward, null -> null
     }
 
     private fun AppConfig.tile(): Tile? {
