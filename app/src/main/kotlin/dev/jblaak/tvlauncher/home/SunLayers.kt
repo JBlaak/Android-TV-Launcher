@@ -35,7 +35,14 @@ internal fun DrawScope.drawSun(sun: Sun, paths: SunPaths, seconds: Float) {
             Brush.verticalGradient(0f to Color(255, 226, 175).copy(alpha = 0.12f), 0.5f to Color(255, 226, 175).copy(alpha = 0f)),
         )
 
-        Sun.BelowHorizon -> Unit
+        is Sun.Diffuse -> drawRoundGradient(
+            sun.position.toOffset(),
+            350f,
+            0f to Color(255, 236, 205).withAlpha(sun.opacity.toFloat()),
+            0.6f to Color(255, 236, 205).withAlpha(0f),
+        )
+
+        Sun.Hidden, Sun.BelowHorizon -> Unit
     }
 }
 

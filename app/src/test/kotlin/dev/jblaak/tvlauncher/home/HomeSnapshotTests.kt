@@ -23,6 +23,11 @@ internal class HomeSnapshotTests(
     }
 
     @Test
+    fun `rain`() {
+        paparazzi.snapshot { HomeRainPreview() }
+    }
+
+    @Test
     fun `oud en nieuw`() {
         paparazzi.snapshot { HomeNewYearsEvePreview() }
     }

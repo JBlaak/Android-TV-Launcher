@@ -806,6 +806,8 @@ class HomeStateHolderTest {
         installedApps = installedApps,
         lastOpenedApp = lastOpenedApp,
         clock = clock,
+        weatherSource = FakeWeatherSource(),
+        lastWeather = FakeLastWeather(),
         listener = listener,
     )
 

@@ -263,6 +263,8 @@ class HomeMomentsTest {
         installedApps = FakeInstalledApps(emptySet()),
         lastOpenedApp = FakeLastOpenedApp(),
         clock = clock,
+        weatherSource = FakeWeatherSource(),
+        lastWeather = FakeLastWeather(),
         listener = RecordingEvents(),
     )
 }

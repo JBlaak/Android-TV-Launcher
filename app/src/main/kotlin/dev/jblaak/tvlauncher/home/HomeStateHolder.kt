@@ -4,25 +4,34 @@ import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.Moment
 import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.SkyWeather
+import dev.jblaak.tvlauncher.sky.Sun
 import dev.jblaak.tvlauncher.sky.SunEvent
 import dev.jblaak.tvlauncher.sky.moment
 import dev.jblaak.tvlauncher.sky.nextSunEvent
 import dev.jblaak.tvlauncher.sky.skyScene
+import dev.jblaak.tvlauncher.weather.WeatherFetch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.minutes
 
 internal class HomeStateHolder(
     private val config: HomeConfig,
     private val installedApps: InstalledApps,
     private val lastOpenedApp: LastOpenedApp,
     private val clock: Clock,
+    private val weatherSource: WeatherSource,
+    private val lastWeather: LastWeather,
     private val listener: Events,
 ) {
+
+    private var fetchedWeather: FetchedWeather? = lastWeather.get()
 
     private val mutableState = MutableStateFlow(homeState())
     val state: StateFlow<HomeState> = mutableState.asStateFlow()
@@ -67,11 +76,58 @@ internal class HomeStateHolder(
                     date = time.toLocalDate(),
                     greeting = time.greeting(),
                     celebration = time.celebration(),
-                    sky = time.sky(),
                     sunTime = time.sunTime(),
-                )
+                ).withWeather(time)
             }
         }
+    }
+
+    /**
+     * Fetches the weather when the last fetch is more than 15 minutes old, and checks again every 15 minutes, until
+     * cancelled. A failed fetch changes nothing.
+     */
+    suspend fun keepWeather() {
+        while (true) {
+            if (fetchedWeather?.isOlderThan(Duration.ofMinutes(15)) != false) fetchWeather()
+            delay(15.minutes)
+        }
+    }
+
+    private suspend fun fetchWeather() {
+        val fetch = weatherSource.fetch()
+        if (fetch !is WeatherFetch.Fetched) return
+        val now = clock.now()
+        val fetched = FetchedWeather(fetch.current, now.toInstant())
+        fetchedWeather = fetched
+        lastWeather.set(fetched)
+        mutableState.update { it.withWeather(now) }
+    }
+
+    private fun HomeState.withWeather(now: ZonedDateTime): HomeState {
+        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
+        return copy(sky = sky, weather = pillWeather(sky))
+    }
+
+    /**
+     * The weather last fetched, while it's at most 3 hours old.
+     */
+    private fun liveWeather(): FetchedWeather? = fetchedWeather?.takeUnless { it.isOlderThan(Duration.ofHours(3)) }
+
+    private fun FetchedWeather.isOlderThan(age: Duration): Boolean = Duration.between(at, clock.now().toInstant()) > age
+
+    private fun pillWeather(sky: SkyScene): PillWeather {
+        val current = liveWeather()?.current
+        val sunUp = sky.sun != Sun.BelowHorizon
+        val (icon, condition) = when (current?.weather ?: SkyWeather.Clear) {
+            SkyWeather.Clear -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.clear
+            SkyWeather.Warm -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.warm
+            SkyWeather.Clouds -> R.drawable.ic_weather_cloudy to R.string.cloudy
+            SkyWeather.Rain -> R.drawable.ic_weather_rain to R.string.rain
+            SkyWeather.Storm -> R.drawable.ic_weather_storm to R.string.storm
+            SkyWeather.Snow -> R.drawable.ic_weather_snow to R.string.snow
+            SkyWeather.Fog -> R.drawable.ic_weather_fog to R.string.fog
+        }
+        return PillWeather(icon = icon, condition = condition, temperature = current?.temperature?.roundToInt())
     }
 
     private fun homeState(): HomeState {
@@ -79,6 +135,7 @@ internal class HomeStateHolder(
         val lastOpened = lastOpenedApp.get()
         val focused = tiles.firstOrNull { it.app == lastOpened } ?: tiles.firstOrNull()
         val now = clock.now()
+        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
         return HomeState(
             tiles = tiles,
             focused = focused?.app,
@@ -87,12 +144,11 @@ internal class HomeStateHolder(
             date = now.toLocalDate(),
             greeting = now.greeting(),
             celebration = now.celebration(),
-            sky = now.sky(),
+            sky = sky,
             sunTime = now.sunTime(),
+            weather = pillWeather(sky),
         )
     }
-
-    private fun ZonedDateTime.sky(): SkyScene = skyScene(toInstant(), config.window, SkyWeather.Clear)
 
     private fun ZonedDateTime.sunTime(): SunTime? = when (val event = nextSunEvent(this, config.window.location)) {
         is SunEvent.Sunrise -> SunTime(R.string.sunrise_time, event.at.toLocalTime())
