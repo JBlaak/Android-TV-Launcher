@@ -41,6 +41,17 @@ adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity
 
 Press Home on the remote to check that the launcher appears.
 
+Debug builds take two extras when started from adb, to check the sky on the emulator:
+
+```bash
+# Start at another local time; time runs on from there
+adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity --es start_time 2026-10-25T17:05
+# Force the API 30 rendering path (no RenderEffect), as on the TV; make run.debug.api30 does this
+adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity --ez force_api30_rendering true
+```
+
+Force-stop the app first (`adb shell am force-stop dev.jblaak.tvlauncher`), because Home reads them only when it starts.
+
 On the Android TV emulator, Google's own launcher has a higher priority than any other Home app and keeps winning. Turn
 it off there with `adb shell pm disable-user --user 0 com.google.android.tvlauncher` (and back on with
 `adb shell pm enable com.google.android.tvlauncher`).

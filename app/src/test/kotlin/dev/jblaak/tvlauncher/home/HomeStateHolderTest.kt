@@ -4,8 +4,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.Sun
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Duration
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class HomeStateHolderTest {
 
@@ -291,14 +297,147 @@ class HomeStateHolderTest {
         )
     }
 
+    @Test
+    fun `before dawn the pill shows the sunrise`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 5, 0)))
+
+        /* Then */
+        assertEquals(R.string.sunrise_time, holder.state.value.sunTime?.label)
+    }
+
+    @Test
+    fun `on 25 october the sun rises at 07 16`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 5, 0)))
+
+        /* Then */
+        assertAbout(LocalTime.of(7, 16), holder.state.value.sunTime?.time)
+    }
+
+    @Test
+    fun `during the day the pill shows the sunset`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 12, 0)))
+
+        /* Then */
+        assertEquals(R.string.sunset_time, holder.state.value.sunTime?.label)
+    }
+
+    @Test
+    fun `on 25 october the sun sets at 17 18`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 12, 0)))
+
+        /* Then */
+        assertAbout(LocalTime.of(17, 18), holder.state.value.sunTime?.time)
+    }
+
+    @Test
+    fun `after sunset the pill shows tomorrow's sunrise`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 21, 0)))
+
+        /* Then */
+        assertEquals(R.string.sunrise_time, holder.state.value.sunTime?.label)
+    }
+
+    @Test
+    fun `at 17 05 on 25 october the sun stands left of centre`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)))
+
+        /* Then */
+        assertTrue(holder.state.value.sunDisc().position.x < 640)
+    }
+
+    @Test
+    fun `at 17 05 on 25 october the sun stands low`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)))
+
+        /* Then */
+        assertTrue(holder.state.value.sunDisc().position.y in 560.0..600.0)
+    }
+
+    @Test
+    fun `at 09 00 the sun is behind the viewer, so there is no disc`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 9, 0)))
+
+        /* Then */
+        assertEquals(Sun.BehindViewer, holder.state.value.sky.sun)
+    }
+
+    @Test
+    fun `at midsummer the sun sets right of centre`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 6, 21, 21, 45)))
+
+        /* Then */
+        assertTrue(holder.state.value.sunDisc().position.x > 640)
+    }
+
+    @Test
+    fun `the sun moves on as time passes`() {
+        /* Given */
+        val clock = FakeClock(amsterdam(2026, 10, 25, 9, 0))
+        val holder = createHolder(clock = clock)
+
+        /* When */
+        clock.time = amsterdam(2026, 10, 25, 17, 5)
+        holder.timePassed()
+
+        /* Then */
+        assertTrue(holder.state.value.sky.sun is Sun.Disc)
+    }
+
+    @Test
+    fun `the pill moves on to the sunset once the sun is up`() {
+        /* Given */
+        val clock = FakeClock(amsterdam(2026, 10, 25, 7, 0))
+        val holder = createHolder(clock = clock)
+
+        /* When */
+        clock.time = amsterdam(2026, 10, 25, 7, 30)
+        holder.timePassed()
+
+        /* Then */
+        assertEquals(R.string.sunset_time, holder.state.value.sunTime?.label)
+    }
+
+    @Test
+    fun `time passing keeps the focus where it is`() {
+        /* Given */
+        val holder = createHolder()
+        holder.focus(App.Plex)
+
+        /* When */
+        holder.timePassed()
+
+        /* Then */
+        assertEquals(App.Plex, holder.state.value.focused)
+    }
+
+    private fun HomeState.sunDisc(): Sun.Disc = sky.sun as Sun.Disc
+
+    private fun assertAbout(expected: LocalTime, actual: LocalTime?) {
+        val difference = Duration.between(expected, checkNotNull(actual)).abs()
+        assertTrue("expected $expected ±2 min, was $actual", difference <= Duration.ofMinutes(2))
+    }
+
+    private fun amsterdam(year: Int, month: Int, day: Int, hour: Int, minute: Int): ZonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, 0, 0, ZoneId.of("Europe/Amsterdam"))
+
     private fun HomeState.tile(app: App): Tile = tiles.single { it.app == app }
 
     private fun createHolder(
         installedApps: InstalledApps = FakeInstalledApps(allPackages),
         lastOpenedApp: LastOpenedApp = FakeLastOpenedApp(),
         listener: HomeStateHolder.Events = RecordingEvents(),
+        clock: Clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)),
     ): HomeStateHolder = HomeStateHolder(
         config = HomeConfig.Enschede,
+        clock = clock,
         installedApps = installedApps,
         lastOpenedApp = lastOpenedApp,
         listener = listener,

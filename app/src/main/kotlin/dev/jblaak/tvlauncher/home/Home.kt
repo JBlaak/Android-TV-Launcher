@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,11 +32,21 @@ internal fun Home(
     onFocus: (App) -> Unit,
     onOpen: (App) -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF101224)),
-    ) {
+    val focusedTile = state.tiles.firstOrNull { it.app == state.focused }
+    Box(modifier = Modifier.fillMaxSize()) {
+        SkyBackground(
+            scene = state.sky,
+            appGlow = focusedTile?.colors?.glow ?: Color.Transparent,
+            modifier = Modifier.fillMaxSize(),
+        )
+        state.sunTime?.let { sunTime ->
+            WeatherPill(
+                sunTime = sunTime,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(horizontal = 68.25.dp, vertical = 48.dp),
+            )
+        }
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -45,7 +54,7 @@ internal fun Home(
                 .padding(horizontal = 54.dp, vertical = 48.dp),
             verticalArrangement = Arrangement.spacedBy(16.5.dp),
         ) {
-            FocusedAppLabel(tile = state.tiles.firstOrNull { it.app == state.focused })
+            FocusedAppLabel(tile = focusedTile)
             Dock(tiles = state.tiles, focused = state.focused, onFocus = onFocus, onOpen = onOpen)
         }
     }
@@ -85,6 +94,12 @@ internal fun HomePreview(
     @PreviewParameter(FocusedAppProvider::class) focused: App,
 ) {
     Home(state = HomeState.previewValue.copy(focused = focused), onFocus = {}, onOpen = {})
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeNightPreview() {
+    Home(state = HomeState.nightPreviewValue, onFocus = {}, onOpen = {})
 }
 
 internal class FocusedAppProvider : PreviewParameterProvider<App> {

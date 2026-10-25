@@ -4,14 +4,25 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
+import dev.jblaak.tvlauncher.sky.SkyScene
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal data class HomeState(
     val tiles: List<Tile>,
     val focused: App?,
+    val sky: SkyScene,
+    val sunTime: SunTime?,
 ) {
     companion object {
-        val previewValue: HomeState = HomeStateHolder(
+        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")))
+
+        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")))
+
+        private fun preview(time: ZonedDateTime): HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
+            clock = { time },
             installedApps = object : InstalledApps {
                 override fun isInstalled(packageName: String): Boolean = true
 
@@ -52,3 +63,11 @@ internal sealed interface TileLogo {
         val colors: LogoColors?,
     ) : TileLogo
 }
+
+/**
+ * The next sunrise or sunset for the pill: [label] is "Sunrise %s" or "Sunset %s", filled with [time].
+ */
+internal data class SunTime(
+    @param:StringRes val label: Int,
+    val time: LocalTime,
+)

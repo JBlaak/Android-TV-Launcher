@@ -8,6 +8,8 @@
     <string name="plex" translatable="false">Plex</string>
     <string name="series_and_films">Series &amp; films</string>
     <string name="subscriptions">Subscriptions</string>
+    <string name="sunrise_time">Sunrise %1$s</string>
+    <string name="sunset_time">Sunset %1$s</string>
     <string name="your_library">Your library</string>
     <string name="your_library_via_plezy">Your library · via Plezy</string>
     <string name="youtube" translatable="false">YouTube</string>
