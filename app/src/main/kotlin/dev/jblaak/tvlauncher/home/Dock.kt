@@ -95,6 +95,7 @@ internal fun Dock(
             .fillMaxWidth()
             .height(120.dp)
             .dropShadow(shape, Shadow(radius = 22.5.dp, color = Color.Black.copy(alpha = 0.6f), spread = (-18).dp, offset = DpOffset(0.dp, 22.5.dp)))
+            .frostedGlass(shape, radius = 39.dp)
             .background(Color.White.copy(alpha = 0.07f), shape)
             .border(1.dp, Color.White.copy(alpha = 0.16f), shape)
             .padding(13.5.dp),
