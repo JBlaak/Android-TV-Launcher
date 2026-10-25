@@ -7,6 +7,15 @@ package dev.jblaak.tvlauncher.sky
 data class SkyScene(
     val colors: SkyColors,
     val sun: Sun,
+    val life: SkyLife,
+)
+
+/**
+ * The life in the sky: now and then a [shootingStars] meteor, and a V of [geese] flying past.
+ */
+data class SkyLife(
+    val shootingStars: Boolean,
+    val geese: Boolean,
 )
 
 /**

@@ -49,7 +49,7 @@ internal fun SkyBackground(
         return
     }
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(animating = scene.sun is Sun.Disc || celebration != null)
+    val seconds = skyTime(animating = scene.sun is Sun.Disc || scene.life.shootingStars || scene.life.geese || celebration != null)
     val sunPaths = remember { SunPaths() }
     val celebrationLayers = remember(celebration) { celebration?.let { CelebrationLayers(it) } }
     Canvas(modifier = modifier.fillMaxSize()) {
@@ -58,6 +58,7 @@ internal fun SkyBackground(
             scale(size.width / 1280f, pivot = Offset.Zero) {
                 drawSky(scene.colors, glow)
                 drawSun(scene.sun, sunPaths, seconds.value)
+                drawSkyLife(scene.life, seconds.value)
                 celebrationLayers?.let { drawCelebration(it, seconds.value) }
             }
         } catch (exception: RuntimeException) {
