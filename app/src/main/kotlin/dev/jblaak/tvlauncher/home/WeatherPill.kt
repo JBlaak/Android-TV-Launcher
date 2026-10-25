@@ -60,7 +60,7 @@ internal fun WeatherPill(
 }
 
 @Composable
-private fun pillText(weather: PillWeather, sunTime: SunTime?): String {
+internal fun pillText(weather: PillWeather, sunTime: SunTime?): String {
     val condition = stringResource(weather.condition)
     val conditionAndTemperature = weather.temperature?.let { stringResource(R.string.condition_and_temperature, condition, it) } ?: condition
     val sun = sunTime?.let { stringResource(it.label, it.time.format(DateTimeFormatter.ofPattern("HH:mm"))) }
