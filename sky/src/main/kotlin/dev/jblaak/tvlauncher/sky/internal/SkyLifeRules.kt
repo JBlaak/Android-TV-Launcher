@@ -1,6 +1,7 @@
 package dev.jblaak.tvlauncher.sky.internal
 
 import dev.jblaak.tvlauncher.sky.SkyLife
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import java.time.Instant
 import java.time.Month
 import java.time.ZoneOffset

@@ -63,6 +63,7 @@ internal fun SkyBackground(
             try {
                 drawSky(currentScene.colors, glow)
                 drawSun(currentScene.sun, sunPaths, seconds.value)
+                drawMoon(currentScene.moon)
                 drawSkyLife(currentScene.life, seconds.value)
                 celebrationLayers?.let { drawCelebration(it, seconds.value) }
             } catch (exception: RuntimeException) {
