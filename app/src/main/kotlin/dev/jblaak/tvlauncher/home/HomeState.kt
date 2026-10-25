@@ -24,7 +24,8 @@ internal data class HomeState(
     val gearFocused: Boolean,
     val time: LocalTime,
     val date: LocalDate,
-    @param:StringRes val greeting: Int,
+    val greeting: Greeting,
+    val celebration: Celebration?,
     val sky: SkyScene,
     val sunTime: SunTime?,
     val weather: PillWeather,
@@ -44,6 +45,10 @@ internal data class HomeState(
         val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
 
         val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Rain)
+
+        val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
+
+        val kingsDayPreviewValue: HomeState = preview(ZonedDateTime.of(2027, 4, 27, 14, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
 
         private fun preview(time: ZonedDateTime, weather: Weather): HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
