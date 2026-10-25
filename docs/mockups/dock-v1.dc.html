@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dock v1</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C9C4DA}a:hover{color:#FFFFFF}
+button{font:inherit;cursor:pointer}
+@keyframes dcFall{from{transform:translate(0,-140px) rotate(var(--rot))}to{transform:translate(var(--dx),880px) rotate(var(--rot))}}
+@keyframes dcScud{from{transform:translateX(var(--from))}to{transform:translateX(var(--to))}}
+@keyframes dcSheet{0%{transform:translateX(var(--from)) skewX(var(--skew));opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(var(--to)) skewX(var(--skew));opacity:0}}
+@keyframes dcLeaf{0%{transform:translate(calc(var(--lx) * -100px),0) rotate(0)}30%{transform:translate(calc(var(--lx) * 380px),-70px) rotate(calc(var(--lx) * 300deg))}60%{transform:translate(calc(var(--lx) * 860px),30px) rotate(calc(var(--lx) * 560deg))}100%{transform:translate(calc(var(--lx) * 1480px),-40px) rotate(calc(var(--lx) * 980deg))}}
+@keyframes dcSnow{0%{transform:translate(0,-30px)}50%{transform:translate(calc(var(--sx) * .5 + 28px),380px)}100%{transform:translate(var(--sx),780px)}}
+@keyframes dcTwinkle{from{opacity:.15}to{opacity:.9}}
+@keyframes dcDrift{from{transform:translateX(-90px)}to{transform:translateX(90px)}}
+@keyframes dcSpin{to{transform:rotate(360deg)}}
+@keyframes dcSpinR{to{transform:rotate(-360deg)}}
+@keyframes dcHaze{from{opacity:.55;transform:scaleY(1)}to{opacity:1;transform:scaleY(1.12)}}
+@keyframes dcFlash{0%,90%,93.5%,96%,100%{opacity:0}91%{opacity:.5}92%{opacity:.05}94.5%{opacity:.3}}
+</style>
+</helmet>
+<div style="{{rootStyle}}">
+<div aria-hidden="true" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none">
+<sc-for list="{{fx}}" as="p" hint-placeholder-count="0"><span style="{{p.s}}"></span></sc-for>
+</div>
+<div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 19px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 22px; font-weight: 500; color: rgba(255,255,255,.75)">{{greeting}} · {{dateLabel}}</div>
+<div style="font-size: 112px; font-weight: 300; letter-spacing: -5px; line-height: .95">{{clock}}</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: center">
+<div style="display: flex; gap: 10px; align-items: center; padding: 12px 20px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(20px); font-size: 18px; font-weight: 500; color: rgba(255,255,255,.85)">
+<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="{{wIcon}}"></path></svg>
+<span>{{wLabel}} {{wTemp}} · {{pillTail}}</span>
+</div>
+<button onClick="{{pickSettings}}" aria-label="Settings" style="{{gearStyle}}">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{gearStroke}}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.730.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2zM15 12a3 3 0 1 1-6 0a3 3 0 1 1 6 0"></path></svg>
+</button>
+</div>
+</div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; gap: 14px; align-items: baseline; padding: 0 19px">
+<span style="font-size: 34px; font-weight: 800; letter-spacing: -1px">{{current.name}}</span>
+<span style="font-size: 20px; font-weight: 500; color: rgba(255,255,255,.75)">{{current.sub}}</span>
+</div>
+<div style="display: flex; gap: 18px; align-items: center; padding: 18px; border-radius: 40px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(30px) saturate(1.4); box-shadow: 0 30px 60px -24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1); height: 160px; box-sizing: border-box">
+<sc-for list="{{apps}}" as="app" hint-placeholder-count="5">
+<button onClick="{{app.pick}}" aria-label="{{app.name}}" style="{{app.tileStyle}}">
+<sc-if value="{{app.isSvg}}" hint-placeholder-val="{{ true }}"><svg aria-hidden="true" viewBox="0 0 24 24" style="{{app.logoStyle}}"><path d="{{app.path}}" fill="{{app.logoFill}}"></path></svg></sc-if>
+<sc-if value="{{app.isImg}}" hint-placeholder-val="{{ false }}"><img src="/_blob/b22708da042d34f4b0084edf1e477bb6" alt="" style="{{app.logoStyle}}"></sc-if>
+<sc-if value="{{app.isText}}" hint-placeholder-val="{{ false }}"><span style="{{app.textStyle}}">Disney<span style="font-weight: 300">+</span></span></sc-if></button>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"focused":{"editor":"enum","options":["npo","netflix","disney","plex","youtube","settings"],"default":"disney"},"weather":{"editor":"enum","options":["clear","warm","clouds","rain","storm","snow","fog"],"default":"clear","section":"Weather"},"live":{"editor":"boolean","default":true,"section":"Time of day"},"hour":{"editor":"range","min":0,"max":24,"step":0.25,"default":21.25,"section":"Time of day"},"season":{"editor":"enum","options":["today","midsummer","midwinter"],"default":"today","section":"Time of day"},"view":{"editor":"range","min":0,"max":359,"step":1,"unit":"°","default":270,"section":"Sun"},"flare":{"editor":"boolean","default":true,"section":"Sun"},"windFrom":{"editor":"range","min":0,"max":359,"step":5,"unit":"°","default":225,"section":"Wind"},"windSpeed":{"editor":"range","min":0,"max":120,"step":5,"unit":" km/h","default":20,"section":"Wind"},"glow":{"editor":"range","min":0,"max":100,"step":5,"unit":"%","default":60},"$preview":{"width":1280,"height":720}}'>
+// Enschede, NL
+var LAT = 52.2215, LON = 6.8937, TZ = 'Europe/Amsterdam';
+
+function sunElevation(t) { return sunPos(t).el; }
+
+// Elevation and azimuth (degrees, clockwise from north).
+function sunPos(t) {
+  var r = Math.PI / 180;
+  var d = t / 86400000 - 10957.5;
+  var g = (357.529 + 0.98560028 * d) * r;
+  var L = (280.459 + 0.98564736 * d + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * r;
+  var e = (23.439 - 0.00000036 * d) * r;
+  var ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+  var dec = Math.asin(Math.sin(e) * Math.sin(L));
+  var lst = ((18.697374558 + 24.06570982441908 * d) * 15 + LON) * r;
+  var h = lst - ra;
+  var el = Math.asin(Math.sin(LAT * r) * Math.sin(dec) + Math.cos(LAT * r) * Math.cos(dec) * Math.cos(h)) / r;
+  var az = Math.atan2(Math.sin(h), Math.cos(h) * Math.sin(LAT * r) - Math.tan(dec) * Math.cos(LAT * r)) / r + 180;
+  return { el: el, az: az % 360 };
+}
+
+// The TV as a window: `view` is the compass direction it looks out to.
+// 8 px per degree gives a 160° wide view; the horizon sits behind the dock.
+var PX_PER_DEG = 8, HORIZON = 600;
+function sunOnScreen(p, view) {
+  var d = ((p.az - view + 540) % 360) - 180;
+  var x = 640 + d * PX_PER_DEG, y = HORIZON - p.el * PX_PER_DEG;
+  var edge = Math.max(0, Math.min(1, (1100 - Math.abs(x - 640)) / 300));
+  return { el: p.el, x: x, y: y, d: d, vis: p.el > -1 ? edge : 0 };
+}
+
+// Sky keyframes by sun elevation: base colour, two corner glows, glow strength.
+var SKY = [
+  { el: -90, base: [13, 14, 26], c1: [70, 60, 150], c2: [30, 90, 120], k: 0.35 },
+  { el: -12, base: [16, 18, 36], c1: [80, 70, 170], c2: [40, 100, 140], k: 0.4 },
+  { el: -6, base: [26, 30, 64], c1: [90, 100, 200], c2: [160, 100, 210], k: 0.55 },
+  { el: -1, base: [50, 30, 58], c1: [255, 125, 85], c2: [205, 85, 150], k: 0.6 },
+  { el: 5, base: [56, 42, 50], c1: [255, 175, 95], c2: [230, 125, 115], k: 0.55 },
+  { el: 15, base: [32, 48, 72], c1: [115, 175, 235], c2: [125, 210, 200], k: 0.5 },
+  { el: 90, base: [40, 60, 88], c1: [145, 200, 245], c2: [155, 225, 215], k: 0.5 }
+];
+
+function mix(a, b, f) { return a.map(function (v, i) { return Math.round(v + (b[i] - v) * f); }); }
+function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a.toFixed(2) + ')'; }
+
+function sky(el) {
+  for (var i = 1; i < SKY.length; i++) {
+    if (el <= SKY[i].el) {
+      var a = SKY[i - 1], b = SKY[i], f = (el - a.el) / (b.el - a.el);
+      return { base: mix(a.base, b.base, f), c1: mix(a.c1, b.c1, f), c2: mix(a.c2, b.c2, f), k: a.k + (b.k - a.k) * f };
+    }
+  }
+  return SKY[SKY.length - 1];
+}
+
+// Weather pulls the sky toward its own base and glow colours.
+var WEATHER = {
+  clear: { label: 'Clear', temp: '11°', mix: 0, k: 1 },
+  warm: { label: 'Sunny', temp: '27°', base: [64, 36, 28], glow: [255, 160, 70], mix: 0.35, k: 1.2 },
+  clouds: { label: 'Cloudy', temp: '12°', base: [40, 44, 52], glow: [150, 160, 175], mix: 0.5, k: 0.7 },
+  rain: { label: 'Rain', temp: '9°', base: [22, 30, 42], glow: [90, 115, 145], mix: 0.6, k: 0.6 },
+  storm: { label: 'Storm', temp: '8°', base: [16, 16, 28], glow: [95, 85, 150], mix: 0.7, k: 0.7 },
+  snow: { label: 'Snow', temp: '-2°', base: [50, 58, 76], glow: [200, 215, 240], mix: 0.55, k: 0.8 },
+  fog: { label: 'Fog', temp: '6°', base: [46, 50, 58], glow: [180, 185, 195], mix: 0.6, k: 0.6 }
+};
+var ICONS = {
+  sun: 'M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+  moon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+  clouds: 'M7 18a4 4 0 0 1-.6-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z',
+  rain: 'M7 14a4 4 0 0 1-.6-8A6 6 0 0 1 18 5a4.5 4.5 0 0 1-.5 9zM8 17l-1 3M12 17l-1 3M16 17l-1 3',
+  storm: 'M7 14a4 4 0 0 1-.6-8A6 6 0 0 1 18 5a4.5 4.5 0 0 1-.5 9zM13 14l-3 4h4l-3 4',
+  snow: 'M7 14a4 4 0 0 1-.6-8A6 6 0 0 1 18 5a4.5 4.5 0 0 1-.5 9zM8 18h.01M12 18h.01M16 18h.01M10 21h.01M14 21h.01',
+  fog: 'M4 9h16M2 13h20M5 17h14'
+};
+
+function rnd(i) { var x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
+
+// Full-screen weather layer: one absolutely placed span per particle or effect.
+// A circle of `size` px centred on (x, y).
+function at(x, y, size, style) {
+  return { s: 'position: absolute; display: block; border-radius: 50%; pointer-events: none; left: ' + (x - size / 2).toFixed(0) + 'px; top: ' + (y - size / 2).toFixed(0) + 'px; width: ' + size + 'px; height: ' + size + 'px; ' + style };
+}
+
+// A real-looking sun: atmospheric glow, starburst, halo, hot core, anamorphic streak and lens-flare ghosts.
+function sunFx(sun, w, flare) {
+  var fx = [], x = sun.x, y = sun.y;
+  var low = sun.el < 3, mid = sun.el < 12;
+  var glow = low ? '255,120,50' : mid ? '255,170,85' : '255,228,170';
+  var core = low ? '255,214,160' : mid ? '255,240,212' : '255,252,244';
+  var k = sun.vis * Math.max(0.35, Math.min(1, (sun.el + 1) / 7)) * (w === 'warm' ? 1.15 : 1);
+  var o = function (a) { return (a * k).toFixed(3); };
+  var screen = 'mix-blend-mode: screen; ';
+  fx.push(at(x, y, 1100, screen + 'background: radial-gradient(circle, rgba(' + glow + ',' + o(0.5) + ') 0%, rgba(' + glow + ',' + o(0.16) + ') 22%, transparent 60%)'));
+  fx.push(at(x, y, 760, screen + 'background: repeating-conic-gradient(from 3deg, rgba(255,248,230,' + o(0.2) + ') 0deg 1deg, transparent 1deg 7.5deg); -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 52%); mask-image: radial-gradient(circle, #000 0%, transparent 52%); animation: dcSpin 260s linear infinite'));
+  fx.push(at(x, y, 520, screen + 'background: repeating-conic-gradient(rgba(255,240,215,' + o(0.12) + ') 0deg 2.5deg, transparent 2.5deg 17deg); -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 55%); mask-image: radial-gradient(circle, #000 0%, transparent 55%); animation: dcSpinR 180s linear infinite'));
+  fx.push(at(x, y, 380, screen + 'background: radial-gradient(circle, transparent 57%, rgba(255,226,180,' + o(0.12) + ') 62%, rgba(170,215,255,' + o(0.08) + ') 66%, transparent 71%)'));
+  fx.push(at(x, y, 70, 'background: radial-gradient(circle, #FFFFFF 0%, #FFFFFF 42%, rgba(' + core + ',1) 58%, rgba(' + core + ',0) 100%); opacity: ' + Math.min(1, sun.vis * 1.2).toFixed(2) + '; box-shadow: 0 0 40px 16px rgba(' + core + ',' + o(0.75) + '), 0 0 140px 50px rgba(' + glow + ',' + o(0.35) + ')'));
+  if (!flare) return fx;
+  fx.push({ s: 'position: absolute; display: block; pointer-events: none; ' + screen + 'left: ' + (x - 520).toFixed(0) + 'px; top: ' + (y - 3).toFixed(0) + 'px; width: 1040px; height: 6px; border-radius: 50%; filter: blur(1.5px); background: linear-gradient(90deg, transparent, rgba(150,190,255,' + o(0.22) + ') 30%, rgba(255,255,255,' + o(0.55) + ') 50%, rgba(150,190,255,' + o(0.22) + ') 70%, transparent)' });
+  // Ghosts sit on the line from the sun through the centre of the screen.
+  var vx = 640 - x, vy = 360 - y;
+  var hex = 'clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); ';
+  var ghosts = [
+    { t: 0.42, size: 34, st: 'background: rgba(255,214,140,' + o(0.22) + ')' },
+    { t: 0.78, size: 96, st: hex + 'background: rgba(120,200,255,' + o(0.09) + ')' },
+    { t: 1.08, size: 20, st: 'background: rgba(255,255,255,' + o(0.25) + ')' },
+    { t: 1.36, size: 150, st: 'background: radial-gradient(circle, rgba(255,140,220,' + o(0.03) + ') 0%, rgba(255,140,220,' + o(0.1) + ') 70%, transparent 72%)' },
+    { t: 1.62, size: 58, st: hex + 'background: rgba(140,255,205,' + o(0.1) + ')' },
+    { t: 1.95, size: 240, st: 'background: radial-gradient(circle, transparent 60%, rgba(255,190,120,' + o(0.08) + ') 66%, rgba(140,200,255,' + o(0.06) + ') 70%, transparent 74%)' },
+    { t: 2.25, size: 44, st: 'background: rgba(200,165,255,' + o(0.12) + ')' }
+  ];
+  ghosts.forEach(function (g) { fx.push(at(x + vx * g.t, y + vy * g.t, g.size, screen + g.st)); });
+  return fx;
+}
+
+// Wind as seen through the window. `from` is where it blows from (meteorological),
+// so it moves toward from + 180°; only its sideways part shows on screen (+ = to the right).
+// A raindrop falls at about 32 km/h, which sets how far the wind tilts it.
+function windOnScreen(from, kmh, view) {
+  var r = Math.PI / 180;
+  var rel = (((from + 180 - view) % 360 + 540) % 360) - 180;
+  var side = kmh * Math.sin(rel * r);
+  var tilt = function (gust) { return Math.max(-55, Math.min(55, Math.atan2(side * gust, 32) / r)); };
+  return { side: side, kmh: kmh, dir: side >= 0 ? 1 : -1, tilt: tilt };
+}
+
+function weatherFx(w, sun, flare, wind) {
+  var fx = [], i, n, el = sun.el;
+  var abs = 'position: absolute; display: block; ';
+  if ((w === 'clear' || w === 'warm') && el > -1 && sun.vis > 0) {
+    fx = fx.concat(sunFx(sun, w, flare));
+  }
+  if ((w === 'clear' || w === 'warm') && el > 0 && sun.vis === 0) {
+    // Sun behind the viewer: only its light on the scene.
+    fx.push({ s: abs + 'inset: 0; background: linear-gradient(180deg, rgba(255,226,175,.12), transparent 50%)' });
+  }
+  if ((w === 'clouds' || w === 'fog' || w === 'rain') && el > 0 && sun.vis > 0) {
+    fx.push(at(sun.x, sun.y, 700, 'background: radial-gradient(circle, rgba(255,236,205,' + (w === 'rain' ? 0.08 : 0.18) * sun.vis + ') 0%, transparent 60%)'));
+  }
+  if ((w === 'clear' || w === 'warm') && el < -6) {
+    for (i = 0; i < 70; i++) {
+      var sz = 1 + rnd(i * 7) * 2;
+      fx.push({ s: abs + 'left: ' + (rnd(i * 7 + 1) * 100).toFixed(2) + '%; top: ' + (rnd(i * 7 + 2) * 62).toFixed(2) + '%; width: ' + sz.toFixed(1) + 'px; height: ' + sz.toFixed(1) + 'px; border-radius: 50%; background: #FFFFFF; animation: dcTwinkle ' + (2 + rnd(i * 7 + 3) * 3).toFixed(1) + 's ease-in-out ' + (-rnd(i * 7 + 4) * 5).toFixed(1) + 's infinite alternate' });
+    }
+  }
+  if (w === 'warm') {
+    fx.push({ s: abs + 'left: 0; right: 0; bottom: 0; height: 320px; transform-origin: bottom; background: linear-gradient(0deg, rgba(255,140,60,.22), transparent); animation: dcHaze 5s ease-in-out infinite alternate' });
+  }
+  if (w === 'storm') {
+    // Low, dark scud racing across with the wind; faster wind, faster clouds.
+    var across = wind.dir > 0 ? '--from: -900px; --to: 1700px; ' : '--from: 1700px; --to: -900px; ';
+    var pace = 60 / Math.max(20, Math.abs(wind.side) + wind.kmh * 0.3);
+    for (i = 0; i < 9; i++) {
+      fx.push({ s: abs + across + 'left: 0; top: ' + (-160 + rnd(i * 5 + 400) * 360).toFixed(0) + 'px; width: ' + (560 + rnd(i * 5 + 401) * 460).toFixed(0) + 'px; height: ' + (170 + rnd(i * 5 + 402) * 150).toFixed(0) + 'px; border-radius: 50%; filter: blur(40px); background: rgba(150,145,190,' + (0.08 + rnd(i * 5 + 403) * 0.1).toFixed(2) + '); animation: dcScud ' + ((12 + rnd(i * 5 + 404) * 12) * pace).toFixed(1) + 's linear ' + (-rnd(i * 5 + 405) * 24 * pace).toFixed(1) + 's infinite' });
+    }
+    // Gusts: curtains of rain sweeping through, slanted like the drops.
+    var sweep = (wind.dir > 0 ? '--from: -1500px; --to: 1500px; ' : '--from: 1500px; --to: -1500px; ') + '--skew: ' + wind.tilt(1).toFixed(1) + 'deg; ';
+    for (i = 0; i < 3; i++) {
+      fx.push({ s: abs + sweep + 'left: 0; top: -80px; width: 1100px; height: 900px; filter: blur(3px); background: repeating-linear-gradient(90deg, transparent 0 14px, rgba(205,215,240,.07) 14px 17px); -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent); animation: dcSheet ' + (3.5 + i * 1.3).toFixed(1) + 's ease-in ' + (-i * 2.1).toFixed(1) + 's infinite' });
+    }
+    // Leaves torn loose and tumbling past, only when the wind blows across the view.
+    if (Math.abs(wind.side) > 20) {
+      var leafTones = ['176,122,58', '140,96,44', '196,150,72', '120,110,52'];
+      var leafFrom = wind.dir > 0 ? 'left: 0; ' : 'left: 1280px; ';
+      for (i = 0; i < 7; i++) {
+        fx.push({ s: abs + '--lx: ' + wind.dir + '; ' + leafFrom + 'top: ' + (12 + rnd(i * 3 + 500) * 62).toFixed(1) + '%; width: ' + (9 + rnd(i * 3 + 501) * 7).toFixed(0) + 'px; height: ' + (5 + rnd(i * 3 + 502) * 3).toFixed(0) + 'px; border-radius: 80% 10% 80% 10%; background: rgba(' + leafTones[i % 4] + ',.9); animation: dcLeaf ' + (2.6 + rnd(i * 3 + 503) * 2.4).toFixed(1) + 's linear ' + (-rnd(i * 3 + 504) * 6).toFixed(1) + 's infinite' });
+      }
+    }
+  }
+  if (w === 'clouds' || w === 'rain' || w === 'snow') {
+    var tone = w === 'storm' ? '150,145,190' : w === 'snow' ? '235,240,255' : '220,226,236';
+    n = w === 'clouds' ? 7 : 5;
+    for (i = 0; i < n; i++) {
+      fx.push({ s: abs + 'left: ' + (rnd(i * 5 + 50) * 90 - 20).toFixed(1) + '%; top: ' + (-140 + rnd(i * 5 + 51) * (w === 'clouds' ? 420 : 220)).toFixed(0) + 'px; width: ' + (520 + rnd(i * 5 + 52) * 420).toFixed(0) + 'px; height: ' + (180 + rnd(i * 5 + 53) * 140).toFixed(0) + 'px; border-radius: 50%; filter: blur(48px); background: rgba(' + tone + ',' + (0.07 + rnd(i * 5 + 54) * 0.08).toFixed(2) + '); animation: dcDrift ' + (40 + rnd(i * 5 + 55) * 40).toFixed(0) + 's ease-in-out ' + (-rnd(i) * 40).toFixed(0) + 's infinite alternate' });
+    }
+  }
+  if (w === 'fog') {
+    for (i = 0; i < 5; i++) {
+      fx.push({ s: abs + 'left: -20%; width: 140%; top: ' + (18 + i * 16) + '%; height: ' + (120 + rnd(i + 90) * 100).toFixed(0) + 'px; border-radius: 50%; filter: blur(34px); background: rgba(220,225,235,' + (0.1 + rnd(i + 91) * 0.08).toFixed(2) + '); animation: dcDrift ' + (30 + rnd(i + 92) * 30).toFixed(0) + 's ease-in-out ' + (-rnd(i + 93) * 30).toFixed(0) + 's infinite alternate' });
+    }
+  }
+  if (w === 'rain' || w === 'storm') {
+    var storm = w === 'storm';
+    n = storm ? 150 : 90;
+    // In a storm a third of the drops ride the gusts (1.5× the wind) and fly flatter.
+    var shapes = [0, 1].map(function (gusty) {
+      var t = wind.tilt(gusty ? 1.5 : 1);
+      var dx = 1020 * Math.tan(t * Math.PI / 180);
+      return { vars: '--rot: ' + (-t).toFixed(1) + 'deg; --dx: ' + dx.toFixed(0) + 'px; ', dx: dx };
+    });
+    for (i = 0; i < n; i++) {
+      var sh = shapes[storm && i % 3 === 0 ? 1 : 0];
+      // Spread the start points so the slanted rain still covers the whole screen.
+      var left = -Math.max(0, sh.dx) + rnd(i * 3 + 200) * (1280 + Math.abs(sh.dx));
+      fx.push({ s: abs + sh.vars + 'top: 0; left: ' + left.toFixed(0) + 'px; width: 1.5px; height: ' + (50 + rnd(i * 3 + 201) * 60).toFixed(0) + 'px; background: linear-gradient(transparent, rgba(215,228,255,' + (0.25 + rnd(i * 3 + 202) * 0.4).toFixed(2) + ')); animation: dcFall ' + ((storm ? 0.45 : 0.65) + rnd(i * 3 + 203) * 0.3).toFixed(2) + 's linear ' + (-rnd(i * 3 + 204) * 2).toFixed(2) + 's infinite' });
+    }
+  }
+  if (w === 'storm') {
+    fx.push({ s: abs + 'inset: 0; background: rgba(225,228,255,1); opacity: 0; animation: dcFlash 9s linear infinite' });
+  }
+  if (w === 'snow') {
+    for (i = 0; i < 80; i++) {
+      var f = 3 + rnd(i * 4 + 300) * 7;
+      fx.push({ s: abs + '--sx: ' + (wind.side * 6).toFixed(0) + 'px; top: 0; left: ' + (rnd(i * 4 + 301) * 100 - wind.side * 0.45).toFixed(2) + '%; width: ' + f.toFixed(1) + 'px; height: ' + f.toFixed(1) + 'px; border-radius: 50%; background: rgba(255,255,255,' + (0.5 + rnd(i * 4 + 302) * 0.5).toFixed(2) + '); filter: blur(' + (f > 7 ? 1.5 : 0) + 'px); animation: dcSnow ' + (9 + rnd(i * 4 + 303) * 10).toFixed(1) + 's linear ' + (-rnd(i * 4 + 304) * 20).toFixed(1) + 's infinite' });
+    }
+  }
+  return fx;
+}
+
+function fmt(t, opts) { return new Date(t).toLocaleString('en-GB', Object.assign({ timeZone: TZ }, opts)); }
+
+class Component extends DCLogic {
+  componentDidMount() { var self = this; this.timer = setInterval(function () { self.forceUpdate(); }, 30000); }
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  renderVals() {
+    var apps = [
+      { id: 'npo', name: 'NPO TV', sub: 'NPO 1 · NPO 2 · NPO 3 live', kind: 'img', size: 60, fill: '', onFill: '', grad: 'linear-gradient(150deg, #2B3A2C, #3E8E3A)', glow: '#4AA83F' },
+      { id: 'netflix', name: 'Netflix', sub: 'Series & films', kind: 'svg', size: 50, fill: '#E50914', onFill: '#FFFFFF', path: 'm5.398 0 8.348 23.602c2.346.059 4.856.398 4.856.398L10.113 0H5.398zm8.489 0v9.172l4.715 13.33V0h-4.715zM5.398 1.5V24c1.873-.225 2.81-.312 4.715-.398V14.83L5.398 1.5z', grad: 'linear-gradient(150deg, #FF3B30, #B20710)', glow: '#E50914' },
+      { id: 'disney', name: 'Disney+', sub: 'Series & films', kind: 'text', size: 28, fill: '#E8ECFF', onFill: '#FFFFFF', grad: 'linear-gradient(150deg, #1CC6D8, #1F6BFF 50%, #170B6B)', glow: '#1F6BFF' },
+      { id: 'plex', name: 'Plex', sub: 'Your library · via Plezy', kind: 'svg', size: 92, fill: '#EDEDED', onFill: '#1A1300', path: 'M3.987 8.409c-.96 0-1.587.28-2.12.933v-.72H0v8.88s.038.018.127.037c.138.03.821.187 1.331-.249.441-.377.542-.814.542-1.318v-1.283c.533.573 1.147.813 2 .813 1.84 0 3.253-1.493 3.253-3.48 0-2.12-1.36-3.613-3.266-3.613Zm16.748 5.595.406.591c.391.614.894.906 1.492.908.621-.012 1.064-.562 1.226-.755 0 0-.307-.27-.686-.72-.517-.614-1.214-1.755-1.24-1.803l-1.198 1.779Zm-3.205-1.955c0-2.08-1.52-3.64-3.52-3.64s-3.467 1.587-3.467 3.573a3.48 3.48 0 0 0 3.507 3.52c1.413 0 2.626-.84 3.253-2.293h-2.04l-.093.093c-.427.4-.72.533-1.227.533-.787 0-1.373-.506-1.453-1.266h4.986c.04-.214.054-.307.054-.52Zm-7.671-.219c0 .769.11 1.701.868 2.722l.056.069c-.306.526-.742.88-1.248.88-.399 0-.814-.211-1.138-.579a2.177 2.177 0 0 1-.538-1.441V6.409H9.86l-.001 5.421Zm9.283 3.46h-2.39l2.247-3.332-2.247-3.335h2.39l2.248 3.335-2.248 3.332Zm1.593-1.286Zm-17.162-.342c-.933 0-1.68-.773-1.68-1.72s.76-1.666 1.68-1.666c.92 0 1.68.733 1.68 1.68 0 .946-.733 1.706-1.68 1.706Zm18.361-1.974L24 8.622h-2.391l-.87 1.293 1.195 1.773Zm-9.404-.466c.16-.706.72-1.133 1.493-1.133.773 0 1.373.467 1.507 1.133h-3Z', grad: 'linear-gradient(150deg, #FFD36B, #E5A00D)', glow: '#E5A00D' },
+      { id: 'youtube', name: 'YouTube', sub: 'Subscriptions', kind: 'svg', size: 58, fill: '#FF0033', onFill: '#FFFFFF', path: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z', grad: 'linear-gradient(150deg, #FF5F6D, #E0002D)', glow: '#FF0033' }
+    ];
+    var focus = (this.state && this.state.focus) || this.props.focused || 'disney';
+    var self = this;
+    var current = apps[2];
+    apps.forEach(function (a) { if (a.id === focus) current = a; });
+    // Settings sits next to the weather pill, one press up from the dock.
+    var onSettings = focus === 'settings';
+    if (onSettings) current = { name: 'Settings', sub: 'Network, display, sound and apps', glow: '#B8C0D0' };
+
+    // Live: the real clock. Otherwise: 25 Oct 2026 (CET, UTC+1) at the chosen hour.
+    var live = this.props.live !== false;
+    var hour = this.props.hour == null ? 21.25 : this.props.hour;
+    // Fixed dates for previews: [year, month, day, UTC offset].
+    var SEASONS = { today: [2026, 9, 25, 1], midsummer: [2026, 5, 21, 2], midwinter: [2026, 11, 21, 1] };
+    var sd = SEASONS[this.props.season] || SEASONS.today;
+    var now = live ? Date.now() : Date.UTC(sd[0], sd[1], sd[2]) + (hour - sd[3]) * 3600000;
+    var view = this.props.view == null ? 270 : this.props.view;
+    var flare = this.props.flare !== false;
+    // Wind: live from the weather data; here a setting, with a typical value per weather.
+    var WIND = { storm: [225, 75], rain: [225, 20], snow: [90, 15] };
+    var wDefault = WIND[this.props.weather] || [225, 12];
+    var windFrom = this.props.windFrom == null ? wDefault[0] : this.props.windFrom;
+    var windKmh = this.props.windSpeed == null ? wDefault[1] : this.props.windSpeed;
+    var wind = windOnScreen(windFrom, windKmh, view);
+    var ymd = fmt(now, { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/');
+    var dayStart = Date.UTC(+ymd[2], +ymd[1] - 1, +ymd[0]) - 2 * 3600000;
+    var rise = null, set = null, prev = sunElevation(dayStart);
+    for (var m = 1; m <= 1440; m++) {
+      var el = sunElevation(dayStart + m * 60000);
+      if (prev < -0.833 && el >= -0.833) rise = dayStart + m * 60000;
+      if (prev >= -0.833 && el < -0.833) set = dayStart + m * 60000;
+      prev = el;
+    }
+    var hm = { hour: '2-digit', minute: '2-digit', hour12: false };
+    var sunLabel = rise && now < rise ? 'Sunrise ' + fmt(rise, hm) : set && now < set ? 'Sunset ' + fmt(set, hm) : 'Sunrise ' + fmt(rise + 86400000, hm);
+    var h = +fmt(now, { hour: '2-digit', hour12: false });
+    var greeting = h < 6 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+
+    var sp = sunPos(now);
+    var elev = sp.el;
+    var sun = sunOnScreen(sp, view);
+    var s = sky(elev);
+    var wKey = WEATHER[this.props.weather] ? this.props.weather : 'clear';
+    var W = WEATHER[wKey];
+    if (W.mix) s = { base: mix(s.base, W.base, W.mix), c1: mix(s.c1, W.glow, W.mix), c2: mix(s.c2, W.glow, W.mix), k: s.k * W.k };
+    var g = (this.props.glow == null ? 60 : this.props.glow) / 100;
+    // The sky's warm glow follows the sun's direction, the cool one sits opposite.
+    var gx = Math.max(-5, Math.min(105, sun.x / 12.8));
+    var gy = Math.max(0, Math.min(90, sun.y / 7.2));
+    var wIcon = (wKey === 'clear' || wKey === 'warm') ? (elev > 0 ? ICONS.sun : ICONS.moon) : ICONS[wKey];
+    var wLabel = (wKey === 'clear' || wKey === 'warm') ? (elev > 0 ? 'Sunny' : wKey === 'warm' ? 'Warm' : 'Clear') : W.label;
+    var c = current.glow;
+    var appGlow = 'rgba(' + parseInt(c.substr(1, 2), 16) + ',' + parseInt(c.substr(3, 2), 16) + ',' + parseInt(c.substr(5, 2), 16) + ',' + (0.75 * g).toFixed(2) + ')';
+
+    var list = apps.map(function (a) {
+      var on = a.id === focus;
+      return Object.assign({}, a, {
+        isSvg: a.kind === 'svg', isImg: a.kind === 'img', isText: a.kind === 'text',
+        logoFill: on ? a.onFill : a.fill,
+        pick: function () { self.setState({ focus: a.id }); },
+        logoStyle: 'display: block; width: ' + a.size + 'px; height: ' + a.size + 'px',
+        textStyle: 'font-weight: 800; letter-spacing: -0.5px; font-size: ' + a.size + 'px; color: ' + (on ? a.onFill : a.fill),
+        tileStyle: 'border: 0; height: 124px; display: flex; align-items: center; justify-content: center; border-radius: 26px; transition: all .3s ease; ' +
+          (on ? 'flex: 1.7 1 0; ' : 'flex: 1 1 0; ') +
+          (on
+            ? 'background: ' + a.grad + '; box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 20px 48px -12px ' + a.glow + 'AA;'
+            : 'background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);')
+      });
+    });
+    return {
+      apps: list,
+      current: current,
+      greeting: greeting,
+      clock: fmt(now, hm),
+      dateLabel: fmt(now, { weekday: 'short', day: 'numeric', month: 'short' }),
+      sunLabel: sunLabel,
+      wIcon: wIcon,
+      wLabel: wLabel,
+      wTemp: W.temp,
+      fx: weatherFx(wKey, sun, flare, wind),
+      pillTail: windKmh >= 50 ? 'Wind ' + ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(windFrom / 45) % 8] + ' ' + Math.round(windKmh) + ' km/h' : sunLabel,
+      pickSettings: function () { self.setState({ focus: 'settings' }); },
+      gearStroke: onSettings ? '#17131F' : 'rgba(255,255,255,.85)',
+      gearStyle: 'width: 50px; height: 50px; border-radius: 25px; display: flex; align-items: center; justify-content: center; padding: 0; transition: all .25s ease; backdrop-filter: blur(20px); ' +
+        (onSettings
+          ? 'border: 0; background: rgba(255,255,255,.94); transform: scale(1.1); box-shadow: 0 0 0 3px rgba(0,0,0,.25), 0 0 0 5px rgba(255,255,255,.85), 0 12px 30px -8px rgba(184,192,208,.6);'
+          : 'border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08);'),
+      rootStyle: 'position: relative; overflow: hidden; width: 1280px; height: 720px; box-sizing: border-box; padding: 64px 72px; color: #FFFFFF; font-family: Figtree, system-ui, sans-serif; display: flex; flex-direction: column; justify-content: space-between; transition: background 1s ease; background: ' +
+        'radial-gradient(70% 75% at 50% 120%, ' + appGlow + ' 0%, transparent 70%), ' +
+        'radial-gradient(60% 70% at ' + gx.toFixed(1) + '% ' + gy.toFixed(1) + '%, ' + rgba(s.c1, s.k * (0.4 + g)) + ' 0%, transparent 65%), ' +
+        'radial-gradient(45% 55% at ' + (100 - gx).toFixed(1) + '% 5%, ' + rgba(s.c2, s.k * (0.25 + g * 0.6)) + ' 0%, transparent 65%), ' +
+        'rgb(' + s.base.join(',') + ')'
+    };
+  }
+}
+</script>
+</body>
+</html>
