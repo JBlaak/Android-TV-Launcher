@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="series_and_films">Series &amp; films</string>
+    <string name="subscriptions">Abonnementen</string>
+    <string name="your_library">Je bibliotheek</string>
+    <string name="your_library_via_plezy">Je bibliotheek · via Plezy</string>
+</resources>
