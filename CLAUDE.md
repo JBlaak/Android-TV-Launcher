@@ -12,6 +12,7 @@ The plan is the spec in issue #1 and its sub-issues (#2 onward), linked as GitHu
 
 - **Principles:** follow MoveLab-Connect-Android at `/Users/jorisblaak/Development/MoveLab-Studio/MoveLab-Connect-Android`. Mirror its build setup, testing style and conventions, except where the spec (#1) deliberately differs: three modules (`sky`, `weather`, `app`), no Acorn, English and Dutch only, comments allowed in `sky`, and Paparazzi snapshots in git.
 - **Skills:** load `kotlin-style` before writing Kotlin, and build every ticket test-first with `tdd`.
+- **Languages:** every ticket adds its own Dutch strings (`values-nl`) alongside the English ones, and its Paparazzi scenes run in English and Dutch. See "Languages" in the README.
 - **PRs:** one branch and PR per ticket. Request a review from @JBlaak; never assign them.
 - **Device:** test on the emulator **`TV_Launcher_API31`**, an Android TV image with the TV's screen (1920×1080, density 320 → 960×540 dp) and 2.8 GB RAM. Start it with `emulator -avd TV_Launcher_API31`. Install every build there and check it by eye before calling a ticket done. It may also be the Home app there.
 - **Emulator gaps:** the real target is a Philips TV on Android 11 (API 30, 32-bit ARM, MediaTek), but no Android TV 11 ARM image exists. So:
