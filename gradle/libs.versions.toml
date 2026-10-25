@@ -1,0 +1,34 @@
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "app" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazzi" }
+
+[versions]
+androidx-activity-compose = "1.13.0"
+androidxComposeBom = "2026.09.00"
+app = "9.4.1"
+# @keep
+compileSdk = "37"
+kotlin = "2.4.21"
+# @keep
+minSdk = "30"
+# @pin
+paparazzi = "2.0.0-alpha05"
+# @keep
+targetSdk = "37"
+testParameterInjector = "1.24"
+
+[libraries]
+# @keep
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "app" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+googleTestParameterInjector = { module = "com.google.testparameterinjector:test-parameter-injector", version.ref = "testParameterInjector" }
+# @keep
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+paparazzi = { module = "app.cash.paparazzi:paparazzi", version.ref = "paparazzi" }
