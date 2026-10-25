@@ -13,7 +13,7 @@ MAKEFLAGS += --no-builtin-rules
 ADB ?= adb
 PACKAGE = dev.jblaak.tvlauncher
 HOME_ACTIVITY = $(PACKAGE)/.HomeActivity
-PROJECTIVY_HOME = com.spocky.projengmenu/.ui.home.MainActivity
+PREVIOUS_HOME ?=
 
 # ---------------------- COMMANDS ---------------------------
 
@@ -36,8 +36,12 @@ run.release: # Install the signed release build over adb, make it Home and open 
 	@$(ADB) shell cmd package set-home-activity $(HOME_ACTIVITY)
 	@$(ADB) shell am start -n $(HOME_ACTIVITY)
 
-home.restore-projectivy: # Hand Home back to Projectivy
-	@$(ADB) shell cmd package set-home-activity $(PROJECTIVY_HOME)
+home.list: # List the installed Home apps
+	@$(ADB) shell pm query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME
+
+home.restore: # Hand Home back to another launcher: make home.restore PREVIOUS_HOME=<package>/<activity>
+	@test -n "$(PREVIOUS_HOME)" || { echo "Set PREVIOUS_HOME, for example from make home.list"; exit 1; }
+	@$(ADB) shell cmd package set-home-activity $(PREVIOUS_HOME)
 	@$(ADB) shell input keyevent KEYCODE_HOME
 
 test: # Unit tests, lint and snapshot verification

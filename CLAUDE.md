@@ -1,26 +1,19 @@
 # Android TV Launcher
 
-A minimal personal Android TV home screen for five apps. The background follows
-the real sun and weather in Enschede. Design decisions, the TV's placement and
-the app list live in `docs/DESIGN.md`.
+A minimal Android TV home screen for five apps. The background follows the real sun, moon and weather in Enschede.
+Design decisions, the window the TV stands in for and the app list live in `docs/DESIGN.md`. Building, installing and
+the debug developer options are in `README.md`.
 
-## Building it
+## Conventions
 
-> Temporary, personal setup for building v1. Issue #17 moves this out before the repo is presented publicly.
-
-The plan is the spec in issue #1 and its sub-issues (#2 onward), linked as GitHub issue dependencies. Pick the next ticket whose blockers are all closed.
-
-- **Principles:** follow MoveLab-Connect-Android at `/Users/jorisblaak/Development/MoveLab-Studio/MoveLab-Connect-Android`. Mirror its build setup, testing style and conventions, except where the spec (#1) deliberately differs: three modules (`sky`, `weather`, `app`), no Acorn, English and Dutch only, comments allowed in `sky`, and Paparazzi snapshots in git.
-- **Skills:** load `kotlin-style` before writing Kotlin, and build every ticket test-first with `tdd`.
-- **Languages:** every ticket adds its own Dutch strings (`values-nl`) alongside the English ones, and its Paparazzi scenes run in English and Dutch. See "Languages" in the README.
-- **PRs:** one branch and PR per ticket. Request a review from @JBlaak; never assign them.
-- **Device:** test on the emulator **`TV_Launcher_API31`**, an Android TV image with the TV's screen (1920×1080, density 320 → 960×540 dp) and 2.8 GB RAM. Start it with `emulator -avd TV_Launcher_API31`. Install every build there and check it by eye before calling a ticket done. It may also be the Home app there.
-- **Emulator gaps:** the real target is a Philips TV on Android 11 (API 30, 32-bit ARM, MediaTek), but no Android TV 11 ARM image exists. So:
-  - Keep minSdk 30 and let lint guard against API 31+ calls.
-  - Give debug builds a way to force the API 30 rendering paths (no RenderEffect blur) so the fallback can be seen on the emulator.
-  - None of the five streaming apps are installed on the emulator. Debug builds may use a fake `InstalledApps` that reports all five as installed; never in release.
-  - Frame rates on the emulator don't reflect the TV. Don't tune particle counts on it.
-- **Checks for the real TV:** wherever a ticket asks for a measurement or check "on the TV", do what's possible on the emulator. Then add the TV-only part as a checklist item in #17, and still close the ticket.
+- **Modules:** three, `sky` (pure Kotlin), `weather` (the Open-Meteo adapter) and `app`. Comments are allowed in `sky`, where the astronomy needs them; elsewhere, let names carry the meaning.
+- **Skills:** load `kotlin-style` before writing Kotlin, and build test-first with `tdd`.
+- **Languages:** every change adds its Dutch strings (`values-nl`) alongside the English ones, and its Paparazzi scenes run in English and Dutch. See "Languages" in the README.
+- **Snapshots:** Paparazzi snapshots are committed. Re-record them with `make snapshots.record` after a UI change.
+- **Android 11:** minSdk is 30 and lint guards against API 31+ calls. Check the API 30 rendering path (no `RenderEffect` blur) with the debug option in the README.
+- **Fakes stay in debug:** the debug developer options (fake installed apps, time and weather overrides) live in `app/src/debug`; release builds use the real adapters.
+- **Frame rates:** emulator frame rates don't reflect a real TV. Tune particle counts on the TV.
+- **PRs:** one branch and PR per issue.
 
 ## Agent skills
 

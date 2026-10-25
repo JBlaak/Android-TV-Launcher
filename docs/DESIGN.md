@@ -3,12 +3,8 @@
 A minimal, personal Android TV home screen for five apps. Its background follows
 the real sun and weather.
 
-Design canvas (all explorations, interactive): https://claude.ai/artifact/MALyuuCfKMDnso7RRtZ3R8
-
-**Version 1 (25 Oct 2026)** is the reference to build from. It's frozen as the "Dock v1 — frozen" board on
-the canvas, and its full mock-up source (layout, sky, sun, weather and wind logic) is in
-[`docs/mockups/dock-v1.dc.html`](mockups/dock-v1.dc.html). The
-"Dock 5 · Frost Night" board on the canvas is the working copy for further exploration.
+**Version 1 (25 Oct 2026)** is the reference to build from. Its full mock-up source (layout, sky, sun, weather
+and wind logic) is in [`docs/mockups/dock-v1.dc.html`](mockups/dock-v1.dc.html).
 
 This document describes v1 **as it shipped** (spec #1). Where the build deliberately differs from the
 mock-up, it says so. Those choices are collected under [Where v1 differs from the mock-up](#where-v1-differs-from-the-mock-up).
@@ -203,7 +199,7 @@ weather fetch brings the sky back. Home never crashes over the sky.
 ## Frame rates
 
 The sky animates at about 30 fps, and only while Home is in front and something moves. The dock's focus
-moves run at the display rate (60 fps). Emulator numbers (`TV_Launcher_API31`, storm at dusk, 25 Oct 17:30,
+moves run at the display rate (60 fps). Emulator numbers (an Android TV 12 emulator with the TV's 1920×1080 screen, storm at dusk, 25 Oct 17:30,
 10 s of `dumpsys gfxinfo`) are in [ADR 0001](adr/0001-glass-blur.md). The TV's own numbers are a check in #17.
 
 ## Where v1 differs from the mock-up
