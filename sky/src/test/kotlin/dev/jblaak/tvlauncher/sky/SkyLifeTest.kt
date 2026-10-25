@@ -145,6 +145,33 @@ class SkyLifeTest {
     }
 
     @Test
+    fun `geese stay away at midday in october`() {
+        /* When */
+        val scene = skyScene(amsterdam(2026, 10, 25, 13, 0), westWindow, SkyWeather.Clear)
+
+        /* Then */
+        assertFalse(scene.life.geese)
+    }
+
+    @Test
+    fun `geese stay away in the afternoon before the sun gets low`() {
+        /* When */
+        val scene = skyScene(amsterdam(2026, 10, 25, 15, 0), westWindow, SkyWeather.Clear)
+
+        /* Then */
+        assertFalse(scene.life.geese)
+    }
+
+    @Test
+    fun `geese stay away around sunrise`() {
+        /* When */
+        val scene = skyScene(amsterdam(2026, 10, 25, 7, 30), westWindow, SkyWeather.Clear)
+
+        /* Then */
+        assertFalse(scene.life.geese)
+    }
+
+    @Test
     fun `geese fly through the rain`() {
         /* When */
         val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow, SkyWeather.Rain)

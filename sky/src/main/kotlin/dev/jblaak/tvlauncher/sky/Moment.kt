@@ -30,8 +30,8 @@ sealed interface Moment {
 }
 
 /**
- * The moment at local time [at], if any. The first match wins: Oud & Nieuw, Koningsdag, then a clock change, which is
- * a UTC offset that differs from the one 24 hours earlier.
+ * The moment at local time [at], if any. The first match wins: Oud & Nieuw, Koningsdag, then a clock change, which
+ * lasts the whole local calendar day on which the UTC offset changes.
  */
 fun moment(at: ZonedDateTime): Moment? = when {
     at.month == Month.DECEMBER && at.dayOfMonth == 31 && at.hour >= 23 -> Moment.NewYearsEve(at.year + 1)
@@ -44,11 +44,12 @@ private fun ZonedDateTime.isKingsDay(): Boolean = month == Month.APRIL &&
     ((dayOfMonth == 27 && dayOfWeek != DayOfWeek.SUNDAY) || (dayOfMonth == 26 && dayOfWeek == DayOfWeek.SATURDAY))
 
 private fun clockChange(at: ZonedDateTime): Moment? {
-    val now = at.offset.totalSeconds
-    val dayBefore = at.zone.rules.getOffset(at.toInstant().minusSeconds(24 * 60 * 60)).totalSeconds
+    val day = at.toLocalDate()
+    val startOfDay = day.atStartOfDay(at.zone).offset.totalSeconds
+    val endOfDay = day.plusDays(1).atStartOfDay(at.zone).offset.totalSeconds
     return when {
-        now < dayBefore -> Moment.ClocksWentBack
-        now > dayBefore -> Moment.ClocksWentForward
+        endOfDay < startOfDay -> Moment.ClocksWentBack
+        endOfDay > startOfDay -> Moment.ClocksWentForward
         else -> null
     }
 }
