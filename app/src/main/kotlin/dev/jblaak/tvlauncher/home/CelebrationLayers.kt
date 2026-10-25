@@ -16,9 +16,6 @@ import dev.jblaak.tvlauncher.sky.fireworks
 import kotlin.math.floor
 import kotlin.math.sqrt
 
-/**
- * The fireworks or bunting of a [celebration], built once and reused every frame.
- */
 internal class CelebrationLayers(celebration: Celebration) {
     val bursts: List<Burst> = if (celebration == Celebration.Fireworks) fireworks() else emptyList()
     val flags: List<Flag> = if (celebration == Celebration.Bunting) bunting() else emptyList()
@@ -30,19 +27,11 @@ internal class CelebrationLayers(celebration: Celebration) {
     }
 }
 
-/**
- * Oud & Nieuw fireworks and Koningsdag bunting as on the design canvas (`whimsyFx`, keyframes dcBloom, dcBurst and
- * dcSway), in reference pixels.
- */
 internal fun DrawScope.drawCelebration(layers: CelebrationLayers, seconds: Float) {
     layers.bursts.forEach { drawBurst(it, seconds) }
     layers.flags.forEach { drawFlag(it, layers.flag, seconds) }
 }
 
-/**
- * A soft bloom that grows from 0.3 to 1.2 times its size and fades by 45% of the period, while 20 sparks fly out
- * and fall 60 px.
- */
 private fun DrawScope.drawBurst(burst: Burst, seconds: Float) {
     val period = burst.periodSeconds.toFloat()
     val progress = (seconds + burst.phaseSeconds.toFloat()).mod(period) / period
@@ -80,9 +69,6 @@ private fun DrawScope.drawBurst(burst: Burst, seconds: Float) {
     }
 }
 
-/**
- * A flag hanging from its anchor along the rope, swaying ±5° there and back, eased in and out.
- */
 private fun DrawScope.drawFlag(flag: Flag, shape: Path, seconds: Float) {
     val time = seconds + flag.phaseSeconds.toFloat()
     val sway = flag.swaySeconds.toFloat()

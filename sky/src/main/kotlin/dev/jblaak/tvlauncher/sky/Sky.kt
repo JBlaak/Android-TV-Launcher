@@ -27,7 +27,7 @@ fun skyScene(at: Instant, window: Window, weather: SkyWeather, wind: Wind): SkyS
         colors = skyColors(sun, onScreen, weather),
         sun = sun(sun, onScreen, weather),
         moon = moon(at, window, weather, sunUp = sun.elevation > 0),
-        life = skyLife(at, sun.elevation, weather),
+        life = skyLife(at, sun, weather),
         effects = weatherEffects(weather, sun.elevation, wind.onScreen(window.facing)),
         glass = windowGlass(weather),
     )
@@ -35,7 +35,7 @@ fun skyScene(at: Instant, window: Window, weather: SkyWeather, wind: Wind): SkyS
 
 /**
  * The moon shows when it's up, in view and at least 3% lit. Clear skies show the disc, paler while the sun is up;
- * clouds dim it; rain, storm, snow and fog leave only its glow, and only at night.
+ * clouds dim it to 45% by day and by night alike; rain, storm, snow and fog leave only its glow, and only at night.
  */
 private fun moon(at: Instant, window: Window, weather: SkyWeather, sunUp: Boolean): Moon {
     val moon = moonPosition(at, window.location)
@@ -45,7 +45,7 @@ private fun moon(at: Instant, window: Window, weather: SkyWeather, sunUp: Boolea
     return when (weather) {
         SkyWeather.Clear, SkyWeather.Warm, SkyWeather.Clouds -> Moon.Disc(
             position = onScreen.point,
-            opacity = (if (sunUp) 0.55 else 1.0) * (if (weather == SkyWeather.Clouds) 0.45 else 1.0) * onScreen.visibility,
+            opacity = discOpacity(weather, sunUp) * onScreen.visibility,
             phase = phase,
         )
 
@@ -55,6 +55,12 @@ private fun moon(at: Instant, window: Window, weather: SkyWeather, sunUp: Boolea
             Moon.Glow(position = onScreen.point, opacity = 0.14 * phase.litFraction * onScreen.visibility)
         }
     }
+}
+
+private fun discOpacity(weather: SkyWeather, sunUp: Boolean): Double = when {
+    weather == SkyWeather.Clouds -> 0.45
+    sunUp -> 0.55
+    else -> 1.0
 }
 
 /**

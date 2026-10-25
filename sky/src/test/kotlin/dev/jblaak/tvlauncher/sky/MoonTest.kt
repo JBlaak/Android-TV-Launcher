@@ -130,6 +130,15 @@ class MoonTest {
     }
 
     @Test
+    fun `behind clouds the daytime moon also shows at 45 percent`() {
+        /* When */
+        val scene = skyScene(amsterdam(2026, 6, 21, 21, 45), westWindow, SkyWeather.Clouds)
+
+        /* Then */
+        assertEquals(0.45, assertIs<Moon.Disc>(scene.moon).opacity, 0.001)
+    }
+
+    @Test
     fun `the moon fades toward the edge of the view`() {
         /* When */
         val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow, SkyWeather.Clear)

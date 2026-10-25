@@ -15,18 +15,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/**
- * The ray and ghost shapes, built once and reused every frame. Ray paths are centred on the origin.
- */
 internal class SunPaths {
-    val raysA: Path = rays(firstDegrees = 3f, widthDegrees = 1f, stepDegrees = 7.5f, radius = 380f)
-    val raysB: Path = rays(firstDegrees = 0f, widthDegrees = 2.5f, stepDegrees = 17f, radius = 260f)
+    val longThinRays: Path = rays(firstDegrees = 3f, widthDegrees = 1f, stepDegrees = 7.5f, radius = 380f)
+    val shortWideRays: Path = rays(firstDegrees = 0f, widthDegrees = 2.5f, stepDegrees = 17f, radius = 260f)
 }
 
-/**
- * The sun as in the v1 mock-up (sunFx), in reference pixels. CSS radial gradients reach the box's farthest corner,
- * so a gradient on a round box of radius r runs to r·√2.
- */
 internal fun DrawScope.drawSun(sun: Sun, paths: SunPaths, seconds: Float) {
     when (sun) {
         is Sun.Disc -> drawDisc(sun, paths, seconds)
@@ -52,8 +45,8 @@ private fun DrawScope.drawDisc(sun: Sun.Disc, paths: SunPaths, seconds: Float) {
     val glow = sun.colors.glow.toColor(1.0)
     val core = sun.colors.core.toColor(1.0)
     drawRoundGradient(centre, 550f, 0f to glow.withAlpha(0.5f * k), 0.22f to glow.withAlpha(0.16f * k), 0.6f to glow.withAlpha(0f))
-    drawRays(paths.raysA, centre, 360f * seconds / 260f, Color(255, 248, 230).withAlpha(0.2f * k), 380f, 0.52f)
-    drawRays(paths.raysB, centre, -360f * seconds / 180f, Color(255, 240, 215).withAlpha(0.12f * k), 260f, 0.55f)
+    drawRays(paths.longThinRays, centre, 360f * seconds / 260f, Color(255, 248, 230).withAlpha(0.2f * k), 380f, 0.52f)
+    drawRays(paths.shortWideRays, centre, -360f * seconds / 180f, Color(255, 240, 215).withAlpha(0.12f * k), 260f, 0.55f)
     drawRoundGradient(
         centre,
         190f,
@@ -67,10 +60,6 @@ private fun DrawScope.drawDisc(sun: Sun.Disc, paths: SunPaths, seconds: Float) {
     drawGhosts(centre, k)
 }
 
-/**
- * The hot core with its two CSS box-shadows (blur 40 spread 16, blur 140 spread 50), approximated by radial fades
- * from the inner to the outer edge of each blur.
- */
 private fun DrawScope.drawCore(centre: Offset, opacity: Float, k: Float, glow: Color, core: Color) {
     drawShadow(centre, radius = 35f + 50f, blur = 140f, color = glow.withAlpha(0.35f * k * opacity))
     drawShadow(centre, radius = 35f + 16f, blur = 40f, color = core.withAlpha(0.75f * k * opacity))
@@ -121,9 +110,6 @@ private fun DrawScope.drawStreak(centre: Offset, k: Float) {
     drawOval(brush, topLeft = Offset(centre.x - 520f, centre.y - 2.5f), size = Size(1040f, 5f), blendMode = BlendMode.Screen)
 }
 
-/**
- * Seven lens-flare ghosts on the line from the sun through the centre of the screen, at fractions of that line.
- */
 private fun DrawScope.drawGhosts(sun: Offset, k: Float) {
     val toCentre = Offset(640f, 360f) - sun
     fun at(t: Float) = sun + toCentre * t
@@ -156,9 +142,6 @@ private fun DrawScope.drawHexagon(centre: Offset, size: Float, color: Color) {
     drawPath(hexagon, color, blendMode = BlendMode.Screen)
 }
 
-/**
- * A round box of [radius] filled with a CSS `radial-gradient(circle, …)`, whose stops run to the farthest corner.
- */
 private fun DrawScope.drawRoundGradient(centre: Offset, radius: Float, vararg stops: Pair<Float, Color>) {
     drawCircle(
         Brush.radialGradient(*stops, center = centre, radius = radius * sqrt(2f)),
@@ -168,9 +151,6 @@ private fun DrawScope.drawRoundGradient(centre: Offset, radius: Float, vararg st
     )
 }
 
-/**
- * A repeating conic gradient of rays, masked by a radial fade that ends at [fadeOutAt] of the farthest corner.
- */
 private fun DrawScope.drawRays(rays: Path, centre: Offset, degrees: Float, color: Color, radius: Float, fadeOutAt: Float) {
     translate(centre.x, centre.y) {
         rotate(degrees, pivot = Offset.Zero) {
@@ -180,9 +160,6 @@ private fun DrawScope.drawRays(rays: Path, centre: Offset, degrees: Float, color
     }
 }
 
-/**
- * Wedges from the origin, as CSS draws a conic gradient: clockwise from the top.
- */
 private fun rays(firstDegrees: Float, widthDegrees: Float, stepDegrees: Float, radius: Float): Path = Path().apply {
     var start = firstDegrees
     while (start < firstDegrees + 360f) {

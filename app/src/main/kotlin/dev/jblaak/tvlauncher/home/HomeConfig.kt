@@ -17,9 +17,6 @@ internal enum class App {
     YouTube,
 }
 
-/**
- * [window] is the TV seen as a window onto the sky outside: where it hangs and which way it looks.
- */
 internal data class HomeConfig(
     val window: Window,
     val apps: List<AppConfig>,
@@ -81,11 +78,6 @@ internal data class HomeConfig(
     }
 }
 
-/**
- * One app in the dock. [targets] are the packages that can open it, in order of preference.
- * Without a bundled [logo] the tile shows the app's TV banner from the system. Without [logoColors] the logo keeps
- * its own colours. [logoSize] is the logo's height, or the text size of the name when there's no logo.
- */
 internal data class AppConfig(
     val app: App,
     @param:StringRes val name: Int,

@@ -24,18 +24,11 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.math.hypot
 
-/**
- * Rain beads or frost on the window pane, in front of everything else in the sky (canvas copy, DockNight whimsyFx),
- * in reference pixels.
- */
 internal fun DrawScope.drawWindowGlass(glass: WindowGlass, seconds: Float) {
     if (glass.frost) drawFrost()
     glass.beads.forEach { drawBead(it, seconds) }
 }
 
-/**
- * Frost creeping in from the bottom corners, and a little from the top left.
- */
 private fun DrawScope.drawFrost() {
     val frost = Color(230, 240, 255)
     drawEllipticalGlow(Offset(0f, 720f), radiusX = 0.4f * 1280, radiusY = 0.5f * 720, color = frost.copy(alpha = 0.16f), fadeOutAt = 0.7f)
@@ -43,10 +36,6 @@ private fun DrawScope.drawFrost() {
     drawEllipticalGlow(Offset.Zero, radiusX = 0.3f * 1280, radiusY = 0.35f * 720, color = frost.copy(alpha = 0.10f), fadeOutAt = 0.7f)
 }
 
-/**
- * A bead: a thin shadow under its lower edge, a clear body with a bright highlight in its upper left, and light caught along
- * its lower rim.
- */
 private fun DrawScope.drawBead(bead: Bead, seconds: Float) {
     val size = Size(bead.width.toFloat(), bead.height.toFloat())
     val topLeft = bead.topLeft.toOffset() + (bead.slide?.let { slid(it, seconds) } ?: Offset.Zero)
@@ -71,10 +60,6 @@ private fun DrawScope.drawLowerRim(color: Color, topLeft: Offset, size: Size, wi
     drawArc(color, startAngle = 20f, sweepAngle = 140f, useCenter = false, topLeft = topLeft, size = size, style = Stroke(width = width))
 }
 
-/**
- * How far a sliding bead has moved: still for the first half of its loop, creeping 40 px down by 62%, then speeding
- * up to 820 px down by the end, each leg eased in.
- */
 private fun slid(slide: Slide, seconds: Float): Offset {
     val progress = progress(seconds, slide.periodSeconds.toFloat(), slide.phaseSeconds.toFloat())
     return when {

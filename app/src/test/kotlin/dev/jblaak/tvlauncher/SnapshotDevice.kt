@@ -11,9 +11,6 @@ import com.android.resources.ScreenSize
 import com.android.resources.TouchScreen
 import com.android.resources.UiMode
 
-/**
- * The Philips TV: 1920×1080 at density 320, so Compose lays out a 960×540 dp canvas.
- */
 internal val Television = DeviceConfig(
     screenHeight = 1080,
     screenWidth = 1920,

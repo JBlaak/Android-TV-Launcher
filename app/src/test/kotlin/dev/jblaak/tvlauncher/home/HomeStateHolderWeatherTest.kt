@@ -73,7 +73,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(10, holder.state.value.weather.temperature)
+        assertEquals(10, holder.state.value.weather?.temperature)
     }
 
     @Test
@@ -85,7 +85,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(-2, holder.state.value.weather.temperature)
+        assertEquals(-2, holder.state.value.weather?.temperature)
     }
 
     @Test
@@ -124,7 +124,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(PillWind(R.string.compass_south_west, 50), holder.state.value.weather.wind)
+        assertEquals(PillWind(R.string.compass_south_west, 50), holder.state.value.weather?.wind)
     }
 
     @Test
@@ -136,7 +136,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(null, holder.state.value.weather.wind)
+        assertEquals(null, holder.state.value.weather?.wind)
     }
 
     @Test
@@ -148,7 +148,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(75, holder.state.value.weather.wind?.speed)
+        assertEquals(75, holder.state.value.weather?.wind?.speed)
     }
 
     @Test
@@ -160,7 +160,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.string.compass_south, holder.state.value.weather.wind?.from)
+        assertEquals(R.string.compass_south, holder.state.value.weather?.wind?.from)
     }
 
     @Test
@@ -172,7 +172,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.string.compass_north, holder.state.value.weather.wind?.from)
+        assertEquals(R.string.compass_north, holder.state.value.weather?.wind?.from)
     }
 
     @Test
@@ -289,7 +289,7 @@ class HomeStateHolderWeatherTest {
         runCurrent()
 
         /* Then */
-        assertEquals(null, holder.state.value.weather.temperature)
+        assertEquals(null, holder.state.value.weather?.temperature)
     }
 
     @Test
@@ -302,7 +302,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.string.rain, holder.state.value.weather.condition)
+        assertEquals(R.string.rain, holder.state.value.weather?.condition)
     }
 
     @Test
@@ -314,7 +314,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_sun to R.string.sunny, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_sun to R.string.sunny, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -326,7 +326,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_sun to R.string.sunny, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_sun to R.string.sunny, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -338,7 +338,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_moon to R.string.warm, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_moon to R.string.warm, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -350,7 +350,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_cloudy to R.string.cloudy, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_cloudy to R.string.cloudy, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -362,7 +362,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_storm to R.string.storm, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_storm to R.string.storm, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -374,7 +374,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_snow to R.string.snow, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_snow to R.string.snow, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     @Test
@@ -386,7 +386,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(R.drawable.ic_weather_fog to R.string.fog, holder.state.value.weather.let { it.icon to it.condition })
+        assertEquals(R.drawable.ic_weather_fog to R.string.fog, holder.state.value.weather?.let { it.icon to it.condition })
     }
 
     private fun TestScope.keepWeather(holder: HomeStateHolder) {

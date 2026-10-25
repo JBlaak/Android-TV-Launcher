@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.Moon
+import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.Sun
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -662,7 +663,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 9, 0)))
 
         /* Then */
-        assertEquals(Sun.BehindViewer, holder.state.value.sky.sun)
+        assertEquals(Sun.BehindViewer, holder.sky().sun)
     }
 
     @Test
@@ -688,7 +689,7 @@ class HomeStateHolderTest {
         runCurrent()
 
         /* Then */
-        assertTrue(holder.state.value.sky.sun is Sun.Disc)
+        assertTrue(holder.sky().sun is Sun.Disc)
     }
 
     @Test
@@ -734,7 +735,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 13, 0)))
 
         /* Then */
-        assertEquals(Moon.Hidden, holder.state.value.sky.moon)
+        assertEquals(Moon.Hidden, holder.sky().moon)
     }
 
     @Test
@@ -760,7 +761,7 @@ class HomeStateHolderTest {
         runCurrent()
 
         /* Then */
-        assertTrue(holder.state.value.sky.moon is Moon.Disc)
+        assertTrue(holder.sky().moon is Moon.Disc)
     }
 
     @Test
@@ -769,7 +770,7 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)))
 
         /* Then */
-        assertTrue(holder.state.value.sky.life.geese)
+        assertTrue(holder.sky().life.geese)
     }
 
     @Test
@@ -778,12 +779,14 @@ class HomeStateHolderTest {
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 23, 0)))
 
         /* Then */
-        assertTrue(holder.state.value.sky.life.shootingStars)
+        assertTrue(holder.sky().life.shootingStars)
     }
 
-    private fun HomeState.sunDisc(): Sun.Disc = sky.sun as Sun.Disc
+    private fun HomeStateHolder.sky(): SkyScene = checkNotNull(state.value.sky)
 
-    private fun HomeState.moonDisc(): Moon.Disc = sky.moon as Moon.Disc
+    private fun HomeState.sunDisc(): Sun.Disc = checkNotNull(sky).sun as Sun.Disc
+
+    private fun HomeState.moonDisc(): Moon.Disc = checkNotNull(sky).moon as Moon.Disc
 
     private fun assertAbout(expected: LocalTime, actual: LocalTime?) {
         val difference = Duration.between(expected, checkNotNull(actual)).abs()

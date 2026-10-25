@@ -23,6 +23,11 @@ internal class HomeSnapshotTests(
     }
 
     @Test
+    fun `without sky or weather`() {
+        paparazzi.snapshot { HomeWithoutSkyPreview() }
+    }
+
+    @Test
     fun `rain`() {
         paparazzi.snapshot { HomeRainPreview() }
     }

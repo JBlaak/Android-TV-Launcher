@@ -38,9 +38,6 @@ import kotlin.math.floor
 import kotlin.math.sin
 import kotlin.math.tan
 
-/**
- * The twinkling stars, drawn behind the moon.
- */
 internal fun DrawScope.drawStars(stars: List<Star>, seconds: Float) {
     for (star in stars) {
         val twinkle = 0.15f + 0.75f * alternating(seconds, star.periodSeconds, star.phaseSeconds)
@@ -48,10 +45,6 @@ internal fun DrawScope.drawStars(stars: List<Star>, seconds: Float) {
     }
 }
 
-/**
- * The weather in front of the sun and moon, back to front as in the v1 mock-up (weatherFx), in reference pixels.
- * The blurs are drawn as soft gradients, which every Android version can draw.
- */
 internal fun DrawScope.drawWeather(effects: WeatherEffects, seconds: Float) {
     if (effects.heatHaze) drawHeatHaze(seconds)
     effects.scud.forEach { drawScud(it, seconds) }
@@ -63,9 +56,6 @@ internal fun DrawScope.drawWeather(effects: WeatherEffects, seconds: Float) {
     effects.snow.forEach { drawFlake(it, seconds) }
 }
 
-/**
- * A warm band along the bottom that breathes: brighter and 12% taller, and back, every 10 s.
- */
 private fun DrawScope.drawHeatHaze(seconds: Float) {
     val breath = alternating(seconds, 5.0, 0.0)
     scale(scaleX = 1f, scaleY = 1f + 0.12f * breath, pivot = Offset(640f, 720f)) {
@@ -89,10 +79,6 @@ private fun DrawScope.drawScud(scud: Scud, seconds: Float) {
     )
 }
 
-/**
- * Vertical stripes of rain, 3 px every 17 px, faded out at both sides, slanted like the drops and swept across with
- * the wind. A curtain fades in over the first fifth of its sweep and out over the last.
- */
 private fun DrawScope.drawCurtain(curtain: Curtain, seconds: Float) {
     val progress = progress(seconds, curtain.periodSeconds.toFloat(), curtain.phaseSeconds.toFloat())
     val opacity = easeIn(
@@ -123,9 +109,6 @@ private fun DrawScope.drawCurtain(curtain: Curtain, seconds: Float) {
     }
 }
 
-/**
- * A leaf tumbling along a fixed path of four points, mirrored when the wind blows to the left.
- */
 private fun DrawScope.drawLeaf(leaf: Leaf, seconds: Float) {
     val progress = progress(seconds, leaf.periodSeconds.toFloat(), leaf.phaseSeconds.toFloat())
     val (x, y, degrees) = keyframes(
@@ -154,9 +137,6 @@ private fun DrawScope.drawCloud(cloud: Cloud, seconds: Float) {
     )
 }
 
-/**
- * A streak falling 1020 px while it drifts with the wind, fading in from its tail and leaning [Drop.tilt] degrees.
- */
 private fun DrawScope.drawDrop(drop: Drop, seconds: Float) {
     val fallen = progress(seconds, drop.periodSeconds.toFloat(), drop.phaseSeconds.toFloat())
     val length = drop.length.toFloat()
@@ -172,9 +152,6 @@ private fun DrawScope.drawDrop(drop: Drop, seconds: Float) {
     )
 }
 
-/**
- * Every 9 s a double flash over the whole screen.
- */
 private fun DrawScope.drawLightning(seconds: Float) {
     val flash = keyframes(
         progress(seconds, 9f, 0f),
@@ -183,9 +160,6 @@ private fun DrawScope.drawLightning(seconds: Float) {
     if (flash > 0f) drawRect(Color(225, 228, 255).copy(alpha = flash))
 }
 
-/**
- * A flake swaying down past a point 28 px right of the middle of its drift.
- */
 private fun DrawScope.drawFlake(flake: Flake, seconds: Float) {
     val drift = flake.drift.toFloat()
     val (x, y) = keyframes(
@@ -203,10 +177,6 @@ private fun DrawScope.drawFlake(flake: Flake, seconds: Float) {
     }
 }
 
-/**
- * An ellipse in the box at [topLeft] blurred by about [blur] px: a radial gradient that reaches [blur] px beyond its
- * edge and fades over twice that across its narrow side.
- */
 private fun DrawScope.drawSoftEllipse(topLeft: Offset, size: Size, blur: Float, color: Color) {
     val centre = topLeft + Offset(size.width / 2, size.height / 2)
     val radiusX = size.width / 2 + blur
@@ -221,9 +191,6 @@ private fun DrawScope.drawSoftEllipse(topLeft: Offset, size: Size, blur: Float, 
     }
 }
 
-/**
- * How far a CSS `alternate` animation with an ease-in-out curve is, 0..1..0: one way in [period] seconds and back.
- */
 private fun alternating(seconds: Float, period: Double, lead: Double): Float {
     val cycle = (seconds + lead) / period
     val leg = (cycle - floor(cycle)).toFloat()

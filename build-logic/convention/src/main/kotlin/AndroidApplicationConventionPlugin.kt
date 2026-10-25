@@ -20,7 +20,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.android.application")
             }
 
-            // Version providers: read from Gradle properties, fallback to local dev defaults
             val versionNameProvider = providers
                 .gradleProperty("versionName")
                 .orElse("development")
@@ -83,22 +82,19 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
 
             extensions.configure<ApplicationAndroidComponentsExtension> {
-                beforeVariants { variant ->
-                    // AGP 9.x: unit tests are now host tests and must be explicitly enabled.
-                    // Without this the test/ source set is not registered as a test root.
-                    variant.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable =
-                        variant.buildType == "release"
-                }
+                enableUnitTestsOnReleaseOnly()
             }
 
             configureAndroidCompose(extensions.getByType<ApplicationExtension>())
         }
     }
 
-    /**
-     * The release key never lives in this repository. Its passwords sit in a properties file in the
-     * owner's home directory (see the README); without that file, release builds stay unsigned.
-     */
+    private fun ApplicationAndroidComponentsExtension.enableUnitTestsOnReleaseOnly() {
+        beforeVariants { variant ->
+            variant.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable = variant.buildType == "release"
+        }
+    }
+
     private fun Project.releaseSigningProperties(): Properties? {
         val path = providers.gradleProperty("tvlauncher.signing")
             .orElse(File(System.getProperty("user.home"), ".android-tv-launcher/signing.properties").path)

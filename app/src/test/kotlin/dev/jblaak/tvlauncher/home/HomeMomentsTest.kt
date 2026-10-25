@@ -61,6 +61,51 @@ class HomeMomentsTest {
     }
 
     @Test
+    fun `from midnight on the day the clocks go back the greeting says so`() {
+        /* When */
+        val holder = createHolder(FakeClock(amsterdam(2026, 10, 25, 0, 0)))
+
+        /* Then */
+        assertEquals(Greeting.Plain(R.string.clocks_went_back), holder.state.value.greeting)
+    }
+
+    @Test
+    fun `until midnight after the clocks go back the greeting says so`() {
+        /* When */
+        val holder = createHolder(FakeClock(amsterdam(2026, 10, 25, 23, 59)))
+
+        /* Then */
+        assertEquals(Greeting.Plain(R.string.clocks_went_back), holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from midnight after the clocks went back the greeting follows the time of day`() {
+        /* When */
+        val holder = createHolder(FakeClock(amsterdam(2026, 10, 26, 0, 0)))
+
+        /* Then */
+        assertEquals(Greeting.Plain(R.string.good_night), holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from midnight on the day the clocks go forward the greeting says so`() {
+        /* When */
+        val holder = createHolder(FakeClock(amsterdam(2026, 3, 29, 0, 0)))
+
+        /* Then */
+        assertEquals(Greeting.Plain(R.string.clocks_went_forward), holder.state.value.greeting)
+    }
+
+    @Test
+    fun `from midnight after the clocks went forward the greeting follows the time of day`() {
+        /* When */
+        val holder = createHolder(FakeClock(amsterdam(2026, 3, 30, 0, 0)))
+
+        /* Then */
+        assertEquals(Greeting.Plain(R.string.good_night), holder.state.value.greeting)
+    }
+
+    @Test
     fun `the clock change greeting follows a time zone that changes its clocks on another day`() {
         /* When */
         val holder = createHolder(FakeClock(ZonedDateTime.of(2026, 11, 1, 12, 0, 0, 0, ZoneId.of("America/New_York"))))

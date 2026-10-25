@@ -128,6 +128,19 @@ internal fun HomeSettingsFocusedPreview() {
 
 @Preview(device = "id:tv_1080p")
 @Composable
+internal fun HomeWithoutSkyPreview() {
+    Home(
+        state = HomeState.previewValue.copy(sky = null, sunTime = null, weather = null),
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
 internal fun HomeNightPreview() {
     Home(
         state = HomeState.nightPreviewValue,
