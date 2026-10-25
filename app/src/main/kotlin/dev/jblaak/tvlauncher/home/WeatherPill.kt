@@ -50,7 +50,7 @@ internal fun WeatherPill(
         )
         BasicText(
             text = pillText(weather, sunTime),
-            style = TextStyle(color = color, fontSize = 13.5.sp, fontWeight = FontWeight.Medium),
+            style = TextStyle(fontFamily = Figtree, color = color, fontSize = 13.5.sp, fontWeight = FontWeight.Medium),
         )
     }
 }

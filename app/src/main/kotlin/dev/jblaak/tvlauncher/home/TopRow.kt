@@ -88,11 +88,12 @@ private fun GreetingAndClock(time: LocalTime, date: LocalDate, greeting: Greetin
     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         BasicText(
             text = stringResource(R.string.dot_separated, greeting.text(), date.format(dateFormat)),
-            style = TextStyle(color = Color.White.copy(alpha = 0.75f), fontSize = 16.5.sp, fontWeight = FontWeight.Medium),
+            style = TextStyle(fontFamily = Figtree, color = Color.White.copy(alpha = 0.75f), fontSize = 16.5.sp, fontWeight = FontWeight.Medium),
         )
         BasicText(
             text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
             style = TextStyle(
+                fontFamily = Figtree,
                 color = Color.White,
                 fontSize = 84.sp,
                 fontWeight = FontWeight.Light,

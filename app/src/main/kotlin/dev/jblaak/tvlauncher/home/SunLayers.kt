@@ -26,6 +26,7 @@ internal fun DrawScope.drawSun(sun: Sun, paths: SunPaths, seconds: Float) {
 
         Sun.BehindViewer -> drawRect(
             Brush.verticalGradient(0f to Color(255, 226, 175).copy(alpha = 0.12f), 0.5f to Color(255, 226, 175).copy(alpha = 0f)),
+            size = ReferenceSize,
         )
 
         is Sun.Diffuse -> drawRoundGradient(

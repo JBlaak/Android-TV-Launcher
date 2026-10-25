@@ -7,8 +7,11 @@ Design canvas (all explorations, interactive): https://claude.ai/artifact/MALyuu
 
 **Version 1 (25 Oct 2026)** is the reference to build from. It's frozen as the "Dock v1 — frozen" board on
 the canvas, and its full mock-up source (layout, sky, sun, weather and wind logic) is in
-[`docs/mockups/dock-v1.dc.html`](mockups/dock-v1.dc.html). This document describes v1. The
+[`docs/mockups/dock-v1.dc.html`](mockups/dock-v1.dc.html). The
 "Dock 5 · Frost Night" board on the canvas is the working copy for further exploration.
+
+This document describes v1 **as it shipped** (spec #1). Where the build deliberately differs from the
+mock-up, it says so. Those choices are collected under [Where v1 differs from the mock-up](#where-v1-differs-from-the-mock-up).
 
 ## Setting
 
@@ -26,9 +29,12 @@ In dock order. Verify package names on the TV with `adb shell pm list packages`.
 |---|---|---|
 | NPO TV | `tech.blaak.npotv` | Own app, [JBlaak/NPO-TV](https://github.com/JBlaak/NPO-TV). Icon: the apple core from its `ic_launcher_foreground`. |
 | Netflix | `com.netflix.ninja` | |
-| Disney+ | `com.disney.disneyplus` | No logo source yet; the mock-up uses a "Disney+" wordmark. |
+| Disney+ | `com.disney.disneyplus` | No bundled logo. The tile shows Disney+'s own TV banner from the system, with tile colours taken from it, or the "Disney+" wordmark when there is no banner. |
 | Plex | `com.edde746.plezy` | Launches [Plezy](https://github.com/edde746/plezy), a Plex client. The tile shows the **Plex** logo and name on purpose, not Plezy's icon. Fallback if Plezy isn't installed: `com.plexapp.android`. |
 | YouTube | `com.google.android.youtube.tv` | |
+
+An app that isn't installed has no tile (Plex first falls back to the Plex app). Coming back Home puts focus on
+the app that was opened last. Holding OK on a tile does nothing.
 
 ## Layout
 
@@ -39,8 +45,9 @@ In dock order. Verify package names on the TV with `adb shell pm list packages`.
 - Bottom: the focused app's name and a one-line description, above a frosted glass bar with five tiles.
 - Tiles you're not on are dark glass with the logo in brand colour. Logos that are dark (Plex) or text (Disney+) are lightened to near-white.
 - The focused tile widens (flex 1.7 vs 1), fills with the app's brand gradient, gets a 2 px white ring and casts a glow in its own colour.
-- Font: Figtree (300/500/700/800).
-- Mock-ups are 1280×720. The real build is 1920×1080 with TV overscan-safe margins (still to do).
+- **Playful focus:** when a tile gains focus, its logo does a small move of its own and the tile dips, overshoots and settles. NPO TV wobbles, Netflix pulses "ta-dum", a cyan sparkle sweeps through Disney+ (a softer white shine over a system banner), Plex slides in from the left, and YouTube nudges forward. The tile that has focus when Home opens stays still.
+- Font: Figtree (300/500/800), bundled with the app under the SIL Open Font License ([`licenses/Figtree-OFL.txt`](licenses/Figtree-OFL.txt)).
+- Mock-ups are 1280×720 px. The TV's 1920×1080 screen at density 320 is 960×540 dp, so every mock-up size is scaled by 0.75 to dp. The mock-up's own 72 × 64 px margins become 54 × 48 dp (108 × 96 px on the TV, 5.6% and 8.9% of the screen), which keeps everything inside the usual overscan-safe area.
 
 ## Background: sky by sun elevation
 
@@ -109,15 +116,19 @@ Each weather type pulls the sky toward its own colours and adds a full-screen ef
 
 | Weather | Sky shift | Effect |
 |---|---|---|
-| Clear | none | Sun (day) or twinkling stars (below −6°) |
+| Clear | none | Sun (day) or 42 twinkling stars (below −6°) |
 | Warm | amber, stronger glows | Brighter sun and a shimmering heat haze along the bottom |
 | Clouds | grey, glows ×0.7 | 7 large blurred clouds drifting slowly |
-| Rain | blue-grey | Clouds and 90 angled streaks |
-| Storm | dark violet-grey | 9 dark clouds racing across with the wind; 150 streaks, a third of them riding gusts; 3 sweeping rain curtains; leaves tumbling past when the wind blows across the view; a lightning flash every 9 s |
-| Snow | lighter, cool | Clouds and 80 flakes of different sizes swaying down |
+| Rain | blue-grey | 5 clouds and 54 angled streaks; beads on the window (see [Window glass](#window-glass)) |
+| Storm | dark violet-grey | 9 dark clouds racing across with the wind; 90 streaks, a third of them riding gusts; 3 sweeping rain curtains; leaves tumbling past when the wind blows across the view; a lightning flash every 9 s; beads on the window |
+| Snow | lighter, cool | 5 clouds and 48 flakes of different sizes swaying down; frost in the corners of the window |
 | Fog | pale grey | 5 blurred bands drifting |
 
-- **Glass bar:** it blurs the effect layer behind it.
+The star, drop and flake counts start about 40% below the mock-up's (70 stars, 90 rain and 150 storm drops,
+80 flakes), because the glass draws the sky several times a frame (see [Frosted glass](#frosted-glass)). Tuning
+them for the TV is a check in #17. The few large clouds, curtains and leaves keep the mock-up's counts.
+
+- **Glass:** the dock, pill and gear blur everything behind them, weather included: no drop, flake or bead shows sharply through them.
 
 ### Wind
 
@@ -139,8 +150,73 @@ The direction of rain, snow, clouds and leaves follows the real wind, seen throu
 - **On Android:** these are per-particle values, the same as in the mock-up, where the CSS uses `--rot`, `--dx` and `--sx`.
 - **Data source:** [Open-Meteo](https://open-meteo.com), which needs no API key. Its WMO weather codes map onto the types above: 0–1 clear (warm from 25 °C), 2–3 cloudy, 45/48 fog, drizzle, rain and showers rain, snow and snow showers snow, 95–99 storm. It also provides `wind_direction_10m`, `wind_speed_10m` and `wind_gusts_10m`. Home fetches it when it comes to the front and the last fetch is more than 15 minutes old, and every 15 minutes while it stays in front. The last result is kept for 3 hours, also across restarts; after that the sky is clear and the pill drops the temperature.
 
+## Window glass
+
+The window pane itself shows the weather, as the last layer of the sky, in front of rain and geese.
+
+- **Rain and storm:** 30 beads (5–18 px wide, 1.12× as tall) spread over the top 92% of the glass, each with a highlight, a light lower rim and a thin shadow. Every fourth bead slides: it holds still for half its 9–17 s loop, creeps 40 px down, then speeds up and runs off the bottom.
+- **Snow:** frost creeps in from the bottom-left, bottom-right and top-left corners.
+- They sit behind the frosted glass, like everything outside, so the dock never looks dirty.
+
+## Sky life
+
+- **Shooting stars:** on a clear or warm night with the sun below −8°, two meteors on 13 s and 21 s loops, about two every 20 s.
+- **Geese:** a V of nine birds with flapping wings flies toward the south-west in February, March and September to November, not in a storm or fog. They fly in an evening band around sunset: the sun in the west (azimuth > 180°) between 10° and −6° elevation, on 25 Oct about 15:55 to 17:55. The flock crosses in the first 55% of a 34 s loop.
+
+## Moments
+
+Special days change the greeting, and some get something in the sky. The first match wins:
+
+- **Oud & Nieuw:** 31 Dec from 23:00 the greeting reads "Almost 2027", 1 Jan before 02:00 "Happy 2027", and fireworks (100 sparks and 5 blooms) go off the whole time.
+- **Koningsdag:** 27 April, or the 26th when the 27th is a Sunday. The greeting is "Fijne Koningsdag" in both languages, and bunting hangs across the top.
+- **Clock change:** all day on the day the clocks change: "Clocks went back · enjoy the extra hour" or "Clocks went forward · an hour shorter night".
+
+## Frosted glass
+
+The dock, the weather pill and the gear are frosted glass over the sky. The TV runs Android 11, which has no
+`RenderEffect`, so the glass draws the sky behind itself a second time, in the same frame
+([ADR 0001](adr/0001-glass-blur.md)):
+
+- **Android 11 (the TV):** the sky is drawn at ⅛ resolution and stretched back up, a cheap blur that never lags the sky.
+- **Android 12 and up:** the sky is drawn through a real blur (26 dp for the gear and pill, 39 dp for the dock).
+
+Every sky layer is drawn inside one backdrop, so the sky, sun, moon, weather, sky life, celebrations and
+window glass all show up blurred behind the glass. Each layer draws in the mock-up's 1280×720 reference
+pixels, full-screen fills included, so the copy behind the glass is as opaque as the sky itself.
+
+## Screensaver
+
+The living sky is also the TV's screensaver, "Living sky" ("Levende lucht"). It shows the sky without the
+dock, with a small clock and weather line that glides to a new spot every minute.
+
+## Language
+
+English and Dutch, following the TV's language. In Dutch the date reads like "zo 25 okt" and the wind like
+"Wind ZW 75 km/u".
+
+## When something fails
+
+If working out the sky, the sun time or the weather fails, Home logs it and falls back to the plain dock on a
+night-blue background, with no sky, pill or sun time. The clock keeps running, and the next successful
+weather fetch brings the sky back. Home never crashes over the sky.
+
+## Frame rates
+
+The sky animates at about 30 fps, and only while Home is in front and something moves. The dock's focus
+moves run at the display rate (60 fps). Emulator numbers (`TV_Launcher_API31`, storm at dusk, 25 Oct 17:30,
+10 s of `dumpsys gfxinfo`) are in [ADR 0001](adr/0001-glass-blur.md). The TV's own numbers are a check in #17.
+
+## Where v1 differs from the mock-up
+
+- **Particle counts** start about 40% lower (see [Weather](#weather)), to leave room for the glass drawing the sky several times a frame.
+- **Glass blur:** the mock-up uses CSS `backdrop-filter: blur(20–30px)`. On the TV the glass is the ⅛-resolution copy of the sky, a softer kind of blur (ADR 0001).
+- **Geese** fly only in the evening band around sunset described under [Sky life](#sky-life). The mock-up only required the sun above −6°.
+- **Window glass** comes last in the sky, in front of the geese and fireworks; the mock-up drew the beads before them.
+- **Daytime moon behind clouds** is at 45%, the same as at night.
+- **Plain dock fallback** when the sky or weather fails, which the mock-up has no need for.
+- **Disney+** shows the system's TV banner instead of a bundled logo.
+
 ## Still to do
 
-- Build at 1920×1080 with overscan-safe margins.
 - Long-press options menu on a tile.
-- A bundled Disney+ logo. Until then the tile shows Disney+'s own TV banner from the system, or its name when there is none.
+- A bundled Disney+ logo.

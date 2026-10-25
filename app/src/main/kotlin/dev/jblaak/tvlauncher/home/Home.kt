@@ -86,12 +86,12 @@ private fun FocusedAppLabel(label: FocusLabel?) {
                 BasicText(
                     text = stringResource(current.name),
                     modifier = Modifier.alignByBaseline(),
-                    style = TextStyle(color = Color.White, fontSize = 25.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.75).sp),
+                    style = TextStyle(fontFamily = Figtree, color = Color.White, fontSize = 25.5.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.75).sp),
                 )
                 BasicText(
                     text = stringResource(current.description),
                     modifier = Modifier.alignByBaseline(),
-                    style = TextStyle(color = Color.White.copy(alpha = 0.75f), fontSize = 15.sp, fontWeight = FontWeight.Medium),
+                    style = TextStyle(fontFamily = Figtree, color = Color.White.copy(alpha = 0.75f), fontSize = 15.sp, fontWeight = FontWeight.Medium),
                 )
             }
         }

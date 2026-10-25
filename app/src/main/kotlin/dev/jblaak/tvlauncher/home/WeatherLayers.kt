@@ -157,7 +157,7 @@ private fun DrawScope.drawLightning(seconds: Float) {
         progress(seconds, 9f, 0f),
         listOf(0f to 0f, 0.9f to 0f, 0.91f to 0.5f, 0.92f to 0.05f, 0.935f to 0f, 0.945f to 0.3f, 0.96f to 0f, 1f to 0f),
     )
-    if (flash > 0f) drawRect(Color(225, 228, 255).copy(alpha = flash))
+    if (flash > 0f) drawRect(Color(225, 228, 255).copy(alpha = flash), size = ReferenceSize)
 }
 
 private fun DrawScope.drawFlake(flake: Flake, seconds: Float) {

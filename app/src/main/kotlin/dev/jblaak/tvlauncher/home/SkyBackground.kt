@@ -18,6 +18,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -109,7 +110,7 @@ private fun secondsWhileResumed(animating: Boolean): State<Float> {
 }
 
 private fun DrawScope.drawSky(colors: SkyColors, appGlow: Color) {
-    drawRect(colors.base.toColor(1.0))
+    drawRect(colors.base.toColor(1.0), size = ReferenceSize)
     drawEllipticalGlow(
         centre = colors.coolCentre.toOffset(),
         radiusX = 0.45f * 1280,
@@ -145,6 +146,8 @@ internal fun Rgb.toColor(alpha: Double): Color = Color(red, green, blue, (alpha.
 internal fun ScreenPoint.toOffset(): Offset = Offset(x.toFloat(), y.toFloat())
 
 private const val GLOW = 0.6
+
+internal val ReferenceSize = Size(1280f, 720f)
 
 @Preview(device = "id:tv_1080p")
 @Composable
