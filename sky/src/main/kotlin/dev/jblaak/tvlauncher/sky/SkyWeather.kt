@@ -1,9 +1,9 @@
-package dev.jblaak.tvlauncher.sky.internal
+package dev.jblaak.tvlauncher.sky
 
 /**
  * The seven kinds of weather the sky knows (v1 mock-up, wx).
  */
-internal enum class SkyWeather {
+enum class SkyWeather {
     Clear,
     Warm,
     Clouds,

@@ -37,7 +37,7 @@ internal data class HomeState(
     companion object {
         val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")))
 
-        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")))
+        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 26, 3, 0, 0, 0, ZoneId.of("Europe/Amsterdam")))
 
         val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")))
 

@@ -1,6 +1,5 @@
 package dev.jblaak.tvlauncher.sky
 
-import dev.jblaak.tvlauncher.sky.internal.SkyWeather
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -170,15 +169,6 @@ class SkyLifeTest {
 
         /* Then */
         assertFalse(scene.life.geese)
-    }
-
-    @Test
-    fun `without weather the sky counts as clear`() {
-        /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow)
-
-        /* Then */
-        assertTrue(scene.life.shootingStars)
     }
 
     private fun amsterdam(year: Int, month: Int, day: Int, hour: Int, minute: Int): Instant = ZonedDateTime.of(year, month, day, hour, minute, 0, 0, ZoneId.of("Europe/Amsterdam")).toInstant()

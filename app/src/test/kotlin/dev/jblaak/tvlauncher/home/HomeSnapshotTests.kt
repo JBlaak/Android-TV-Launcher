@@ -18,7 +18,7 @@ internal class HomeSnapshotTests(
     val paparazzi = Paparazzi(deviceConfig = Television.copy(locale = locale.tag))
 
     @Test
-    fun `night`() {
+    fun `night with moon`() {
         paparazzi.snapshot { HomeNightPreview() }
     }
 

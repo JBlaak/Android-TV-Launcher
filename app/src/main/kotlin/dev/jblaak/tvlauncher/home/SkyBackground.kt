@@ -58,6 +58,7 @@ internal fun SkyBackground(
             scale(size.width / 1280f, pivot = Offset.Zero) {
                 drawSky(scene.colors, glow)
                 drawSun(scene.sun, sunPaths, seconds.value)
+                drawMoon(scene.moon)
                 drawSkyLife(scene.life, seconds.value)
                 celebrationLayers?.let { drawCelebration(it, seconds.value) }
             }
