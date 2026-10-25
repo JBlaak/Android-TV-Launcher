@@ -11,6 +11,7 @@ import dev.jblaak.tvlauncher.sky.internal.skyLife
 import dev.jblaak.tvlauncher.sky.internal.sunPosition
 import dev.jblaak.tvlauncher.sky.internal.tinted
 import dev.jblaak.tvlauncher.sky.internal.weatherEffects
+import dev.jblaak.tvlauncher.sky.internal.windowGlass
 import java.time.Instant
 import kotlin.math.min
 
@@ -28,6 +29,7 @@ fun skyScene(at: Instant, window: Window, weather: SkyWeather, wind: Wind): SkyS
         moon = moon(at, window, weather, sunUp = sun.elevation > 0),
         life = skyLife(at, sun.elevation, weather),
         effects = weatherEffects(weather, sun.elevation, wind.onScreen(window.facing)),
+        glass = windowGlass(weather),
     )
 }
 

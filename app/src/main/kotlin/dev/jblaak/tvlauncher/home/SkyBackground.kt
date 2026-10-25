@@ -57,6 +57,7 @@ internal fun SkyBackground(
     val seconds = skyTime(
         animating = scene.sun is Sun.Disc ||
             scene.effects != WeatherEffects.None ||
+            scene.glass.beads.any { it.slide != null } ||
             scene.life.shootingStars ||
             scene.life.geese ||
             celebration != null,
@@ -75,6 +76,7 @@ internal fun SkyBackground(
                 drawSkyLife(currentScene.life, seconds.value)
                 drawWeather(currentScene.effects, seconds.value)
                 celebrationLayers?.let { drawCelebration(it, seconds.value) }
+                drawWindowGlass(currentScene.glass, seconds.value)
             } catch (exception: RuntimeException) {
                 Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
                 failed = true
@@ -157,7 +159,7 @@ private fun DrawScope.drawSky(colors: SkyColors, appGlow: Color) {
     )
 }
 
-private fun DrawScope.drawEllipticalGlow(centre: Offset, radiusX: Float, radiusY: Float, color: Color, fadeOutAt: Float) {
+internal fun DrawScope.drawEllipticalGlow(centre: Offset, radiusX: Float, radiusY: Float, color: Color, fadeOutAt: Float) {
     scale(scaleX = 1f, scaleY = radiusY / radiusX, pivot = centre) {
         val brush = Brush.radialGradient(0f to color, fadeOutAt to color.copy(alpha = 0f), center = centre, radius = radiusX)
         drawCircle(brush, radius = radiusX, center = centre)
