@@ -104,8 +104,13 @@ internal class HomeStateHolder(
     }
 
     private fun HomeState.withWeather(now: ZonedDateTime): HomeState {
-        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
+        val sky = sky(now)
         return copy(sky = sky, weather = pillWeather(sky))
+    }
+
+    private fun sky(now: ZonedDateTime): SkyScene {
+        val current = liveWeather()?.current ?: return skyScene(now.toInstant(), config.window, SkyWeather.Clear)
+        return skyScene(now.toInstant(), config.window, current.weather, current.wind)
     }
 
     /**
@@ -127,15 +132,31 @@ internal class HomeStateHolder(
             SkyWeather.Snow -> R.drawable.ic_weather_snow to R.string.snow
             SkyWeather.Fog -> R.drawable.ic_weather_fog to R.string.fog
         }
-        return PillWeather(icon = icon, condition = condition, temperature = current?.temperature?.roundToInt())
+        return PillWeather(
+            icon = icon,
+            condition = condition,
+            temperature = current?.temperature?.roundToInt(),
+            wind = current?.wind?.takeIf { it.speed >= 50 }?.let { PillWind(compassPoint(it.from), it.speed.roundToInt()) },
+        )
     }
+
+    private fun compassPoint(from: Double): Int = listOf(
+        R.string.compass_north,
+        R.string.compass_north_east,
+        R.string.compass_east,
+        R.string.compass_south_east,
+        R.string.compass_south,
+        R.string.compass_south_west,
+        R.string.compass_west,
+        R.string.compass_north_west,
+    )[(from / 45).roundToInt().mod(8)]
 
     private fun homeState(): HomeState {
         val tiles = config.apps.mapNotNull { it.tile() }
         val lastOpened = lastOpenedApp.get()
         val focused = tiles.firstOrNull { it.app == lastOpened } ?: tiles.firstOrNull()
         val now = clock.now()
-        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
+        val sky = sky(now)
         return HomeState(
             tiles = tiles,
             focused = focused?.app,

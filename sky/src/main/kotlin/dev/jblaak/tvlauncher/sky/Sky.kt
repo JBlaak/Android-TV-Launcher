@@ -4,15 +4,22 @@ import dev.jblaak.tvlauncher.sky.internal.Horizontal
 import dev.jblaak.tvlauncher.sky.internal.WindowPosition
 import dev.jblaak.tvlauncher.sky.internal.moonPhase
 import dev.jblaak.tvlauncher.sky.internal.moonPosition
+import dev.jblaak.tvlauncher.sky.internal.onScreen
 import dev.jblaak.tvlauncher.sky.internal.project
 import dev.jblaak.tvlauncher.sky.internal.skyKeyframe
 import dev.jblaak.tvlauncher.sky.internal.skyLife
 import dev.jblaak.tvlauncher.sky.internal.sunPosition
 import dev.jblaak.tvlauncher.sky.internal.tinted
+import dev.jblaak.tvlauncher.sky.internal.weatherEffects
 import java.time.Instant
 import kotlin.math.min
 
-fun skyScene(at: Instant, window: Window, weather: SkyWeather): SkyScene {
+/**
+ * The sky with the [typicalWind] for [weather], for when there's no live wind.
+ */
+fun skyScene(at: Instant, window: Window, weather: SkyWeather): SkyScene = skyScene(at, window, weather, typicalWind(weather))
+
+fun skyScene(at: Instant, window: Window, weather: SkyWeather, wind: Wind): SkyScene {
     val sun = sunPosition(at, window.location)
     val onScreen = project(sun, window.facing)
     return SkyScene(
@@ -20,6 +27,7 @@ fun skyScene(at: Instant, window: Window, weather: SkyWeather): SkyScene {
         sun = sun(sun, onScreen, weather),
         moon = moon(at, window, weather, sunUp = sun.elevation > 0),
         life = skyLife(at, sun.elevation, weather),
+        effects = weatherEffects(weather, sun.elevation, wind.onScreen(window.facing)),
     )
 }
 

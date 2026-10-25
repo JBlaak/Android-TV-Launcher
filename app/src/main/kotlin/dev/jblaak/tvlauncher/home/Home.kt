@@ -154,6 +154,19 @@ internal fun HomeRainPreview() {
 
 @Preview(device = "id:tv_1080p")
 @Composable
+internal fun HomeStormPreview() {
+    Home(
+        state = HomeState.stormPreviewValue,
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
 internal fun HomeNewYearsEvePreview() {
     Home(
         state = HomeState.newYearsEvePreviewValue,

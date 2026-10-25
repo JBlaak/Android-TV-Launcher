@@ -27,7 +27,7 @@ class HomeStateHolderWeatherTest {
         val holder = createHolder(clock = FakeClock(at(21, 15)))
 
         /* Then */
-        assertEquals(PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null), holder.state.value.weather)
+        assertEquals(PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null, wind = null), holder.state.value.weather)
     }
 
     @Test
@@ -61,7 +61,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9), holder.state.value.weather)
+        assertEquals(PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9, wind = null), holder.state.value.weather)
     }
 
     @Test
@@ -98,7 +98,81 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, SkyWeather.Rain), holder.state.value.sky)
+        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, SkyWeather.Rain, rain.wind), holder.state.value.sky)
+    }
+
+    @Test
+    fun `the live wind blows through the sky`() = runTest {
+        /* Given */
+        val storm = rain.copy(weather = SkyWeather.Storm, wind = Wind(from = 200.0, speed = 60.0, gusts = 90.0))
+        val holder = createHolder(clock = FakeClock(at(17, 5)), weatherSource = FakeWeatherSource(fetched(storm)))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, SkyWeather.Storm, storm.wind), holder.state.value.sky)
+    }
+
+    @Test
+    fun `a wind of 50 km per hour shows in the pill`() = runTest {
+        /* Given */
+        val storm = rain.copy(weather = SkyWeather.Storm, wind = Wind(from = 225.0, speed = 50.0, gusts = 80.0))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(storm)))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(PillWind(R.string.compass_south_west, 50), holder.state.value.weather.wind)
+    }
+
+    @Test
+    fun `a wind below 50 km per hour leaves the pill to the sun time`() = runTest {
+        /* Given */
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(wind = Wind(from = 225.0, speed = 49.4, gusts = 80.0)))))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(null, holder.state.value.weather.wind)
+    }
+
+    @Test
+    fun `the pill rounds the wind speed`() = runTest {
+        /* Given */
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(wind = Wind(from = 225.0, speed = 74.6, gusts = 90.0)))))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(75, holder.state.value.weather.wind?.speed)
+    }
+
+    @Test
+    fun `the pill names the nearest of eight compass points the wind blows from`() = runTest {
+        /* Given */
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(wind = Wind(from = 200.0, speed = 60.0, gusts = 90.0)))))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(R.string.compass_south, holder.state.value.weather.wind?.from)
+    }
+
+    @Test
+    fun `a wind from just west of north comes from the north`() = runTest {
+        /* Given */
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(wind = Wind(from = 350.0, speed = 60.0, gusts = 90.0)))))
+
+        /* When */
+        keepWeather(holder)
+
+        /* Then */
+        assertEquals(R.string.compass_north, holder.state.value.weather.wind?.from)
     }
 
     @Test
@@ -185,7 +259,7 @@ class HomeStateHolderWeatherTest {
         val holder = createHolder(clock = FakeClock(at(17, 59)), lastWeather = lastWeather)
 
         /* Then */
-        assertEquals(PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9), holder.state.value.weather)
+        assertEquals(PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9, wind = null), holder.state.value.weather)
     }
 
     @Test
@@ -197,7 +271,7 @@ class HomeStateHolderWeatherTest {
         val holder = createHolder(clock = FakeClock(at(21, 1)), lastWeather = lastWeather)
 
         /* Then */
-        assertEquals(PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null), holder.state.value.weather)
+        assertEquals(PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null, wind = null), holder.state.value.weather)
     }
 
     @Test
