@@ -124,6 +124,7 @@ private fun SettingsGear(
                 Shadow(radius = 11.25.dp, color = Color(0xFFB8C0D0).copy(alpha = 0.6f * focus), spread = (-6).dp, offset = DpOffset(0.dp, 9.dp)),
             )
             .gearRings(focus)
+            .frostedGlass(CircleShape, radius = 26.dp)
             .background(lerp(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.94f), focus), CircleShape)
             .semantics { contentDescription = description }
             .onFocusChanged { if (it.isFocused) onFocus() }

@@ -6,14 +6,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -33,36 +37,61 @@ import dev.jblaak.tvlauncher.sky.Sun
 import kotlinx.coroutines.delay
 
 /**
- * The living sky behind Home, drawn on one Canvas. It animates at up to 30 fps, and only while Home is resumed.
- * If drawing ever fails, it falls back to the plain night-blue background for good.
+ * The living sky behind Home, drawn on one Canvas, with [content] on top. It animates at up to 30 fps, and only while
+ * Home is resumed. If drawing ever fails, it falls back to the plain night-blue background for good.
+ *
+ * The same drawing is offered to [content] as [LocalSkyBackdrop], so frosted glass can show the sky behind it.
  */
 @Composable
 internal fun SkyBackground(
     scene: SkyScene,
     appGlow: Color,
     modifier: Modifier,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     var failed by remember { mutableStateOf(false) }
-    if (failed) {
-        Box(modifier = modifier.background(Color(0xFF101224)))
-        return
-    }
+    val currentScene by rememberUpdatedState(scene)
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
     val seconds = skyTime(animating = scene.sun is Sun.Disc)
     val sunPaths = remember { SunPaths() }
-    Canvas(modifier = modifier.fillMaxSize()) {
-        @Suppress("TooGenericExceptionCaught")
-        try {
-            scale(size.width / 1280f, pivot = Offset.Zero) {
-                drawSky(scene.colors, glow)
-                drawSun(scene.sun, sunPaths, seconds.value)
+    val backdrop = remember {
+        SkyBackdrop {
+            if (failed) return@SkyBackdrop
+            @Suppress("TooGenericExceptionCaught")
+            try {
+                drawSky(currentScene.colors, glow)
+                drawSun(currentScene.sun, sunPaths, seconds.value)
+            } catch (exception: RuntimeException) {
+                Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
+                failed = true
             }
-        } catch (exception: RuntimeException) {
-            Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
-            failed = true
+        }
+    }
+    Box(modifier = modifier.background(Color(0xFF101224))) {
+        if (!failed) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                scale(size.width / 1280f, pivot = Offset.Zero) {
+                    with(backdrop) { drawReference() }
+                }
+            }
+        }
+        CompositionLocalProvider(LocalSkyBackdrop provides backdrop) {
+            content()
         }
     }
 }
+
+/**
+ * The sky as glass sees it: the same layers as [SkyBackground], in 1280×720 reference pixels.
+ */
+internal fun interface SkyBackdrop {
+    fun DrawScope.drawReference()
+}
+
+/**
+ * The sky behind the content, or null outside a [SkyBackground].
+ */
+internal val LocalSkyBackdrop = staticCompositionLocalOf<SkyBackdrop?> { null }
 
 /**
  * Seconds of animation since Home first showed, advanced by frames at most 30 times a second while Home is
@@ -130,5 +159,5 @@ private const val GLOW = 0.6
 @Preview(device = "id:tv_1080p")
 @Composable
 internal fun SkyBackgroundPreview() {
-    SkyBackground(scene = HomeState.previewValue.sky, appGlow = Color(0xFF4AA83F), modifier = Modifier.fillMaxSize())
+    SkyBackground(scene = HomeState.previewValue.sky, appGlow = Color(0xFF4AA83F), modifier = Modifier.fillMaxSize()) {}
 }

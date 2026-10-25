@@ -35,12 +35,11 @@ internal fun Home(
     onLeaveSettings: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        SkyBackground(
-            scene = state.sky,
-            appGlow = if (state.gearFocused) Color(0xFFB8C0D0) else state.tiles.firstOrNull { it.app == state.focused }?.colors?.glow ?: Color.Transparent,
-            modifier = Modifier.fillMaxSize(),
-        )
+    SkyBackground(
+        scene = state.sky,
+        appGlow = if (state.gearFocused) Color(0xFFB8C0D0) else state.tiles.firstOrNull { it.app == state.focused }?.colors?.glow ?: Color.Transparent,
+        modifier = Modifier.fillMaxSize(),
+    ) {
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
