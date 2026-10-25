@@ -153,7 +153,7 @@ private fun DrawScope.drawSky(backdrop: SkyBackdrop, window: SkyWindow) {
 internal fun FrostedGlassPreview() {
     val scene = HomeState.previewValue.sky
     val sun = (scene.sun as Sun.Disc).position
-    SkyBackground(scene = scene, appGlow = Color(0xFFE50914), modifier = Modifier.fillMaxSize()) {
+    SkyBackground(scene = scene, celebration = null, appGlow = Color(0xFFE50914), modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .offset((sun.x * 0.75 - 150).dp, (sun.y * 0.75 - 30).dp)

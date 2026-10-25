@@ -5,7 +5,6 @@ import android.view.KeyEvent.KEYCODE_DPAD_DOWN
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
 import android.view.KeyEvent.KEYCODE_DPAD_RIGHT
 import android.view.KeyEvent.KEYCODE_DPAD_UP
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -59,7 +58,7 @@ import java.time.format.DateTimeFormatter
 internal fun TopRow(
     time: LocalTime,
     date: LocalDate,
-    @StringRes greeting: Int,
+    greeting: Greeting,
     sunTime: SunTime?,
     gearFocused: Boolean,
     onFocusSettings: () -> Unit,
@@ -82,12 +81,12 @@ internal fun TopRow(
 }
 
 @Composable
-private fun GreetingAndClock(time: LocalTime, date: LocalDate, @StringRes greeting: Int) {
+private fun GreetingAndClock(time: LocalTime, date: LocalDate, greeting: Greeting) {
     val locale = LocalConfiguration.current.locales[0]
     val dateFormat = remember(locale) { DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEdMMM"), locale) }
     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         BasicText(
-            text = stringResource(R.string.greeting_and_date, stringResource(greeting), date.format(dateFormat)),
+            text = stringResource(R.string.greeting_and_date, greeting.text(), date.format(dateFormat)),
             style = TextStyle(color = Color.White.copy(alpha = 0.75f), fontSize = 16.5.sp, fontWeight = FontWeight.Medium),
         )
         BasicText(
