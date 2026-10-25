@@ -60,6 +60,19 @@ sealed interface Sun {
      */
     data object BehindViewer : Sun
 
+    /**
+     * The sun is up and in view but behind clouds, fog or rain: only a soft glow at [position].
+     */
+    data class Diffuse(
+        val position: ScreenPoint,
+        val opacity: Double,
+    ) : Sun
+
+    /**
+     * The sun is up but the weather hides it, or its light, completely.
+     */
+    data object Hidden : Sun
+
     data object BelowHorizon : Sun
 }
 

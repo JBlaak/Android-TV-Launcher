@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">TV Launcher</string>
+    <string name="clear">Clear</string>
+    <string name="cloudy">Cloudy</string>
+    <string name="condition_and_temperature" translatable="false">%1$s %2$d°</string>
     <string name="disney_plus" translatable="false">Disney+</string>
+    <string name="dot_separated" translatable="false">%1$s · %2$s</string>
+    <string name="fog">Fog</string>
     <string name="good_afternoon">Good afternoon</string>
     <string name="good_evening">Good evening</string>
     <string name="good_morning">Good morning</string>
     <string name="good_night">Good night</string>
-    <string name="greeting_and_date" translatable="false">%1$s · %2$s</string>
     <string name="netflix" translatable="false">Netflix</string>
     <string name="npo_live_channels" translatable="false">NPO 1 · NPO 2 · NPO 3 live</string>
     <string name="npo_tv" translatable="false">NPO TV</string>
     <string name="plex" translatable="false">Plex</string>
+    <string name="rain">Rain</string>
     <string name="series_and_films">Series &amp; films</string>
     <string name="settings">Settings</string>
     <string name="settings_description">Network, display, sound and apps</string>
+    <string name="snow">Snow</string>
+    <string name="storm">Storm</string>
     <string name="subscriptions">Subscriptions</string>
+    <string name="sunny">Sunny</string>
     <string name="sunrise_time">Sunrise %1$s</string>
     <string name="sunset_time">Sunset %1$s</string>
+    <string name="warm">Warm</string>
     <string name="your_library">Your library</string>
     <string name="your_library_via_plezy">Your library · via Plezy</string>
     <string name="youtube" translatable="false">YouTube</string>

@@ -50,6 +50,7 @@ internal fun Home(
                 time = state.time,
                 date = state.date,
                 greeting = state.greeting,
+                weather = state.weather,
                 sunTime = state.sunTime,
                 gearFocused = state.gearFocused,
                 onFocusSettings = onFocusSettings,
@@ -130,6 +131,19 @@ internal fun HomeSettingsFocusedPreview() {
 internal fun HomeNightPreview() {
     Home(
         state = HomeState.nightPreviewValue,
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeRainPreview() {
+    Home(
+        state = HomeState.rainPreviewValue,
         onFocus = {},
         onOpen = {},
         onFocusSettings = {},

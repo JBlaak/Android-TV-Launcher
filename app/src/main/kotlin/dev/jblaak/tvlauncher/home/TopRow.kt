@@ -60,6 +60,7 @@ internal fun TopRow(
     time: LocalTime,
     date: LocalDate,
     @StringRes greeting: Int,
+    weather: PillWeather,
     sunTime: SunTime?,
     gearFocused: Boolean,
     onFocusSettings: () -> Unit,
@@ -75,7 +76,7 @@ internal fun TopRow(
     ) {
         GreetingAndClock(time = time, date = date, greeting = greeting)
         Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
-            sunTime?.let { WeatherPill(sunTime = it, modifier = Modifier) }
+            WeatherPill(weather = weather, sunTime = sunTime, modifier = Modifier)
             SettingsGear(focused = gearFocused, onFocus = onFocusSettings, onLeave = onLeaveSettings, onOpen = onOpenSettings)
         }
     }
@@ -87,7 +88,7 @@ private fun GreetingAndClock(time: LocalTime, date: LocalDate, @StringRes greeti
     val dateFormat = remember(locale) { DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEdMMM"), locale) }
     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         BasicText(
-            text = stringResource(R.string.greeting_and_date, stringResource(greeting), date.format(dateFormat)),
+            text = stringResource(R.string.dot_separated, stringResource(greeting), date.format(dateFormat)),
             style = TextStyle(color = Color.White.copy(alpha = 0.75f), fontSize = 16.5.sp, fontWeight = FontWeight.Medium),
         )
         BasicText(
@@ -166,6 +167,7 @@ internal fun TopRowPreview() {
             time = HomeState.previewValue.time,
             date = HomeState.previewValue.date,
             greeting = HomeState.previewValue.greeting,
+            weather = HomeState.previewValue.weather,
             sunTime = HomeState.previewValue.sunTime,
             gearFocused = true,
             onFocusSettings = {},

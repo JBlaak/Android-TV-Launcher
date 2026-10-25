@@ -17,12 +17,20 @@ import dev.jblaak.tvlauncher.apps.PackageManagerInstalledApps
 import dev.jblaak.tvlauncher.apps.SharedPreferencesLastOpenedApp
 import dev.jblaak.tvlauncher.apps.buildClock
 import dev.jblaak.tvlauncher.apps.buildInstalledApps
+import dev.jblaak.tvlauncher.apps.buildLastWeather
 import dev.jblaak.tvlauncher.apps.buildRendering
+import dev.jblaak.tvlauncher.apps.buildWeatherSource
 import dev.jblaak.tvlauncher.home.Home
 import dev.jblaak.tvlauncher.home.HomeConfig
 import dev.jblaak.tvlauncher.home.HomeStateHolder
 import dev.jblaak.tvlauncher.home.LocalRendering
+import dev.jblaak.tvlauncher.home.WeatherSource
+import dev.jblaak.tvlauncher.weather.OpenMeteo
+import dev.jblaak.tvlauncher.weather.SharedPreferencesLastWeather
+import dev.jblaak.tvlauncher.weather.WeatherFetch
+import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class HomeActivity : ComponentActivity() {
 
@@ -34,6 +42,8 @@ class HomeActivity : ComponentActivity() {
             installedApps = buildInstalledApps(installedApps),
             lastOpenedApp = SharedPreferencesLastOpenedApp(getSharedPreferences("home", Context.MODE_PRIVATE)),
             clock = buildClock(intent),
+            weatherSource = buildWeatherSource(intent, openMeteo()),
+            lastWeather = buildLastWeather(intent, SharedPreferencesLastWeather(getSharedPreferences("weather", Context.MODE_PRIVATE))),
             listener = object : HomeStateHolder.Events {
                 override fun appLaunchRequested(packageName: String) {
                     installedApps.launchIntent(packageName)?.let { startActivity(it) }
@@ -51,7 +61,10 @@ class HomeActivity : ComponentActivity() {
         val rendering = buildRendering(intent)
         onBackPressedDispatcher.addCallback(this) {}
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) { homeStateHolder.keepTime() }
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch { homeStateHolder.keepWeather() }
+                homeStateHolder.keepTime()
+            }
         }
         setContent {
             val state by homeStateHolder.state.collectAsState()
@@ -65,6 +78,13 @@ class HomeActivity : ComponentActivity() {
                     onOpenSettings = homeStateHolder::openSettings,
                 )
             }
+        }
+    }
+
+    private fun openMeteo(): WeatherSource {
+        val openMeteo = OpenMeteo(engine = CIO.create(), timeout = 10.seconds)
+        return object : WeatherSource {
+            override suspend fun fetch(): WeatherFetch = openMeteo.fetch(HomeConfig.Enschede.window.location)
         }
     }
 

@@ -13,7 +13,7 @@ class SkySceneTest {
     @Test
     fun `on an october evening the sun stands low left of centre`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow, Weather.Clear)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -24,7 +24,7 @@ class SkySceneTest {
     @Test
     fun `in the morning the sun is behind the viewer and only lights the sky`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow, Weather.Clear)
 
         /* Then */
         assertEquals(Sun.BehindViewer, scene.sun)
@@ -33,7 +33,7 @@ class SkySceneTest {
     @Test
     fun `at night the sun is below the horizon`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow, Weather.Clear)
 
         /* Then */
         assertEquals(Sun.BelowHorizon, scene.sun)
@@ -42,7 +42,7 @@ class SkySceneTest {
     @Test
     fun `at midsummer the sun sets right of centre`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 6, 21, 21, 45), westWindow)
+        val scene = skyScene(amsterdam(2026, 6, 21, 21, 45), westWindow, Weather.Clear)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -52,7 +52,7 @@ class SkySceneTest {
     @Test
     fun `a sun near the horizon glows red-orange`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow, Weather.Clear)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -62,7 +62,7 @@ class SkySceneTest {
     @Test
     fun `a sun high in the sky is near-white`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 6, 21, 17, 0), westWindow)
+        val scene = skyScene(amsterdam(2026, 6, 21, 17, 0), westWindow, Weather.Clear)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -72,7 +72,7 @@ class SkySceneTest {
     @Test
     fun `the warm glow follows the sun`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow, Weather.Clear)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -82,7 +82,7 @@ class SkySceneTest {
     @Test
     fun `the cool glow sits opposite the warm glow near the top`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow)
+        val scene = skyScene(amsterdam(2026, 10, 25, 17, 5), westWindow, Weather.Clear)
 
         /* Then */
         assertEquals(ScreenPoint(1280 - scene.colors.warmCentre.x, 36.0), scene.colors.coolCentre)
@@ -91,7 +91,7 @@ class SkySceneTest {
     @Test
     fun `the deepest night is still not black`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 12, 21, 0, 30), westWindow)
+        val scene = skyScene(amsterdam(2026, 12, 21, 0, 30), westWindow, Weather.Clear)
 
         /* Then */
         assertTrue(scene.colors.base.let { it.red + it.green + it.blue } > 40, "base was ${scene.colors.base}")

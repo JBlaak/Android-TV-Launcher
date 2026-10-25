@@ -6,6 +6,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.SkyScene
+import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.Wind
+import dev.jblaak.tvlauncher.weather.CurrentWeather
+import dev.jblaak.tvlauncher.weather.WeatherFetch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -23,6 +27,7 @@ internal data class HomeState(
     @param:StringRes val greeting: Int,
     val sky: SkyScene,
     val sunTime: SunTime?,
+    val weather: PillWeather,
 ) {
     val focusedTile: App? get() = focused.takeUnless { gearFocused }
 
@@ -34,11 +39,13 @@ internal data class HomeState(
         }
 
     companion object {
-        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")))
+        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
 
-        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")))
+        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
 
-        private fun preview(time: ZonedDateTime): HomeState = HomeStateHolder(
+        val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Rain)
+
+        private fun preview(time: ZonedDateTime, weather: Weather): HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
             installedApps = object : InstalledApps {
                 override fun isInstalled(packageName: String): Boolean = true
@@ -52,6 +59,17 @@ internal data class HomeState(
             },
             clock = object : Clock {
                 override fun now(): ZonedDateTime = time
+            },
+            weatherSource = object : WeatherSource {
+                override suspend fun fetch(): WeatherFetch = WeatherFetch.Failed
+            },
+            lastWeather = object : LastWeather {
+                override fun get(): FetchedWeather = FetchedWeather(
+                    current = CurrentWeather(weather = weather, temperature = 9.0, wind = Wind(from = 225.0, speed = 20.0, gusts = 35.0)),
+                    at = time.toInstant(),
+                )
+
+                override fun set(weather: FetchedWeather) = Unit
             },
             listener = object : HomeStateHolder.Events {
                 override fun appLaunchRequested(packageName: String) = Unit
@@ -68,6 +86,16 @@ internal data class HomeState(
 internal data class SunTime(
     @param:StringRes val label: Int,
     val time: LocalTime,
+)
+
+/**
+ * The weather half of the pill: an [icon], the [condition] and the [temperature] in whole degrees, which is null
+ * when there's no recent weather.
+ */
+internal data class PillWeather(
+    @param:DrawableRes val icon: Int,
+    @param:StringRes val condition: Int,
+    val temperature: Int?,
 )
 
 internal data class FocusLabel(

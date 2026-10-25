@@ -27,6 +27,8 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.ui)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.core)
 
     testImplementation(libs.paparazzi)
     testImplementation(libs.googleTestParameterInjector)

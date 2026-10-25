@@ -39,7 +39,7 @@ internal fun skyKeyframe(elevation: Double): SkyKeyframe {
     )
 }
 
-private fun Rgb.blend(other: Rgb, fraction: Double): Rgb = Rgb(
+internal fun Rgb.blend(other: Rgb, fraction: Double): Rgb = Rgb(
     red = blend(red, other.red, fraction),
     green = blend(green, other.green, fraction),
     blue = blend(blue, other.blue, fraction),

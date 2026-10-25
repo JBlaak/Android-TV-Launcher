@@ -137,11 +137,10 @@ The direction of rain, snow, clouds and leaves follows the real wind, seen throu
 - **Rain curtains** sweep across in that direction, slanted at the rain's angle.
 - **Leaves** only appear when `|side| > 20 km/h`.
 - **On Android:** these are per-particle values, the same as in the mock-up, where the CSS uses `--rot`, `--dx` and `--sx`.
-- **Data source:** still to choose. [Open-Meteo](https://open-meteo.com) needs no API key. Its WMO weather codes map onto the types above, and it also provides `wind_direction_10m`, `wind_speed_10m` and `wind_gusts_10m`. The temperatures in the mock-ups are placeholders.
+- **Data source:** [Open-Meteo](https://open-meteo.com), which needs no API key. Its WMO weather codes map onto the types above: 0–1 clear (warm from 25 °C), 2–3 cloudy, 45/48 fog, drizzle, rain and showers rain, snow and snow showers snow, 95–99 storm. It also provides `wind_direction_10m`, `wind_speed_10m` and `wind_gusts_10m`. Home fetches it when it comes to the front and the last fetch is more than 15 minutes old, and every 15 minutes while it stays in front. The last result is kept for 3 hours, also across restarts; after that the sky is clear and the pill drops the temperature.
 
 ## Still to do
 
 - Build at 1920×1080 with overscan-safe margins.
 - Long-press options menu on a tile.
-- Live weather.
 - A bundled Disney+ logo. Until then the tile shows Disney+'s own TV banner from the system, or its name when there is none.
