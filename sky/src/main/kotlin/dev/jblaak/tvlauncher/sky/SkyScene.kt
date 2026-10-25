@@ -10,6 +10,7 @@ data class SkyScene(
     val moon: Moon,
     val life: SkyLife,
     val effects: WeatherEffects,
+    val glass: WindowGlass,
 )
 
 /**
