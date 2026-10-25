@@ -17,7 +17,7 @@ We read the API ≤ 30 path of Haze 2.0.1 (`RenderScriptBlurVisualEffectDelegate
 
 Our sky is procedural. One frame is a pure function of the scene, the app glow and the animation time, drawn in 1280×720 reference pixels. Drawing it a second time, offset to where the glass sits, gives an exact copy of what's behind the glass in the same frame. At ⅛ resolution the dock’s copy is 213 × 30 pixels instead of 1704 × 240.
 
-Measured on the `TV_Launcher_API31` emulator, Home at 17:05 with the sun and rays animating, 10 s of `dumpsys gfxinfo` (emulator frame times don't reflect the TV):
+Measured on an Android TV 12 (API 31) emulator with the TV's 1920×1080 screen, Home at 17:05 with the sun and rays animating, 10 s of `dumpsys gfxinfo` (emulator frame times don't reflect the TV):
 
 | Path | Frames | Janky | 50th / 90th / 99th percentile |
 | --- | --- | --- | --- |
