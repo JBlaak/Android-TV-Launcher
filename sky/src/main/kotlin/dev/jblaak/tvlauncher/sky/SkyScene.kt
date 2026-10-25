@@ -8,6 +8,15 @@ data class SkyScene(
     val colors: SkyColors,
     val sun: Sun,
     val moon: Moon,
+    val life: SkyLife,
+)
+
+/**
+ * The life in the sky: now and then a [shootingStars] meteor, and a V of [geese] flying past.
+ */
+data class SkyLife(
+    val shootingStars: Boolean,
+    val geese: Boolean,
 )
 
 /**

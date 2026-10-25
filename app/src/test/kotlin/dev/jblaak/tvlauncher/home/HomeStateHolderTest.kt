@@ -763,6 +763,24 @@ class HomeStateHolderTest {
         assertTrue(holder.state.value.sky.moon is Moon.Disc)
     }
 
+    @Test
+    fun `geese fly past on an october evening`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)))
+
+        /* Then */
+        assertTrue(holder.state.value.sky.life.geese)
+    }
+
+    @Test
+    fun `shooting stars cross a clear october night`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 23, 0)))
+
+        /* Then */
+        assertTrue(holder.state.value.sky.life.shootingStars)
+    }
+
     private fun HomeState.sunDisc(): Sun.Disc = sky.sun as Sun.Disc
 
     private fun HomeState.moonDisc(): Moon.Disc = sky.moon as Moon.Disc
