@@ -4,11 +4,32 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
+import dev.jblaak.tvlauncher.R
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
+/**
+ * [focused] is the tile focus returns to, also while the gear has the focus.
+ */
 internal data class HomeState(
     val tiles: List<Tile>,
     val focused: App?,
+    val gearFocused: Boolean,
+    val time: LocalTime,
+    val date: LocalDate,
+    @param:StringRes val greeting: Int,
 ) {
+    val focusedTile: App? get() = focused.takeUnless { gearFocused }
+
+    val label: FocusLabel?
+        get() = if (gearFocused) {
+            FocusLabel(R.string.settings, R.string.settings_description)
+        } else {
+            tiles.firstOrNull { it.app == focused }?.let { FocusLabel(it.name, it.description) }
+        }
+
     companion object {
         val previewValue: HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
@@ -22,12 +43,22 @@ internal data class HomeState(
 
                 override fun set(app: App) = Unit
             },
+            clock = object : Clock {
+                override fun now(): ZonedDateTime = ZonedDateTime.of(2026, 10, 25, 21, 15, 0, 0, ZoneId.of("Europe/Amsterdam"))
+            },
             listener = object : HomeStateHolder.Events {
                 override fun appLaunchRequested(packageName: String) = Unit
+
+                override fun settingsRequested() = Unit
             },
         ).state.value
     }
 }
+
+internal data class FocusLabel(
+    @param:StringRes val name: Int,
+    @param:StringRes val description: Int,
+)
 
 internal data class Tile(
     val app: App,
