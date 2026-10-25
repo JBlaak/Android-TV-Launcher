@@ -70,6 +70,26 @@ On the Android TV emulator, Google's own launcher has a higher priority than any
 it off there with `adb shell pm disable-user --user 0 com.google.android.tvlauncher` (and back on with
 `adb shell pm enable com.google.android.tvlauncher`).
 
+## Screensaver
+
+The app also offers the living sky as the TV's screensaver ("Living sky", "Levende lucht" in Dutch): the full sky
+without the dock, with a small clock and weather line that moves to a new spot every minute. Pick it, and the idle
+delay, in the TV's own screensaver settings.
+
+If the TV's settings don't list it (Philips may hide third-party screensavers), select it over adb:
+
+```bash
+adb shell settings get secure screensaver_components   # note the current value, to go back to it later
+adb shell settings put secure screensaver_components dev.jblaak.tvlauncher/.SkyScreensaver
+adb shell settings put secure screensaver_enabled 1
+```
+
+The TV's idle delay still applies. To see it straight away, start the screensaver now:
+
+```bash
+adb shell am start -n com.android.systemui/.Somnambulator
+```
+
 ## Restore Projectivy as Home
 
 One command hands Home back to Projectivy, which stays installed:

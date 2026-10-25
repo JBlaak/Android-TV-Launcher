@@ -16,6 +16,7 @@
     <string name="good_morning">Good morning</string>
     <string name="good_night">Good night</string>
     <string name="happy_year">Happy %1$d</string>
+    <string name="living_sky">Living sky</string>
     <string name="netflix" translatable="false">Netflix</string>
     <string name="npo_live_channels" translatable="false">NPO 1 · NPO 2 · NPO 3 live</string>
     <string name="npo_tv" translatable="false">NPO TV</string>
