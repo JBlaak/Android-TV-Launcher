@@ -23,6 +23,13 @@ run.debug: # Install the debug build over adb, make it Home and open it
 	@$(ADB) shell cmd package set-home-activity $(HOME_ACTIVITY)
 	@$(ADB) shell am start -n $(HOME_ACTIVITY)
 
+run.debug.api30: # Install the debug build and open it on the API 30 rendering path (no RenderEffect)
+	@./gradlew :app:assembleDebug
+	@$(ADB) install -r app/build/outputs/apk/debug/app-debug.apk
+	@$(ADB) shell cmd package set-home-activity $(HOME_ACTIVITY)
+	@$(ADB) shell am force-stop $(PACKAGE)
+	@$(ADB) shell am start -n $(HOME_ACTIVITY) --ez force_api30_rendering true
+
 run.release: # Install the signed release build over adb, make it Home and open it
 	@./gradlew :app:assembleRelease
 	@$(ADB) install -r app/build/outputs/apk/release/app-release.apk

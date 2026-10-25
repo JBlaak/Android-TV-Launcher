@@ -8,6 +8,8 @@
     <string name="settings">Instellingen</string>
     <string name="settings_description">Netwerk, beeld, geluid en apps</string>
     <string name="subscriptions">Abonnementen</string>
+    <string name="sunrise_time">Zonsopkomst %1$s</string>
+    <string name="sunset_time">Zonsondergang %1$s</string>
     <string name="your_library">Je bibliotheek</string>
     <string name="your_library_via_plezy">Je bibliotheek · via Plezy</string>
 </resources>

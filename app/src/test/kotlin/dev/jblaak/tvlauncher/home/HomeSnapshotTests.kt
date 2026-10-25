@@ -18,6 +18,11 @@ internal class HomeSnapshotTests(
     val paparazzi = Paparazzi(deviceConfig = Television.copy(locale = locale.tag))
 
     @Test
+    fun `night`() {
+        paparazzi.snapshot { HomeNightPreview() }
+    }
+
+    @Test
     fun `npo tv focused`() {
         paparazzi.snapshot { HomePreview(App.NpoTv) }
     }

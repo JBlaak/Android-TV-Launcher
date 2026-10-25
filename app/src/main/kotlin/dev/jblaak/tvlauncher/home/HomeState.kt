@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.SkyScene
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -20,6 +21,8 @@ internal data class HomeState(
     val time: LocalTime,
     val date: LocalDate,
     @param:StringRes val greeting: Int,
+    val sky: SkyScene,
+    val sunTime: SunTime?,
 ) {
     val focusedTile: App? get() = focused.takeUnless { gearFocused }
 
@@ -31,7 +34,11 @@ internal data class HomeState(
         }
 
     companion object {
-        val previewValue: HomeState = HomeStateHolder(
+        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")))
+
+        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")))
+
+        private fun preview(time: ZonedDateTime): HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
             installedApps = object : InstalledApps {
                 override fun isInstalled(packageName: String): Boolean = true
@@ -44,7 +51,7 @@ internal data class HomeState(
                 override fun set(app: App) = Unit
             },
             clock = object : Clock {
-                override fun now(): ZonedDateTime = ZonedDateTime.of(2026, 10, 25, 21, 15, 0, 0, ZoneId.of("Europe/Amsterdam"))
+                override fun now(): ZonedDateTime = time
             },
             listener = object : HomeStateHolder.Events {
                 override fun appLaunchRequested(packageName: String) = Unit
@@ -54,6 +61,14 @@ internal data class HomeState(
         ).state.value
     }
 }
+
+/**
+ * The next sunrise or sunset for the pill: [label] is "Sunrise %s" or "Sunset %s", filled with [time].
+ */
+internal data class SunTime(
+    @param:StringRes val label: Int,
+    val time: LocalTime,
+)
 
 internal data class FocusLabel(
     @param:StringRes val name: Int,

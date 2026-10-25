@@ -6,6 +6,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.Location
+import dev.jblaak.tvlauncher.sky.Window
 
 internal enum class App {
     NpoTv,
@@ -15,11 +17,16 @@ internal enum class App {
     YouTube,
 }
 
+/**
+ * [window] is the TV seen as a window onto the sky outside: where it hangs and which way it looks.
+ */
 internal data class HomeConfig(
+    val window: Window,
     val apps: List<AppConfig>,
 ) {
     companion object {
         val Enschede = HomeConfig(
+            window = Window(location = Location(latitude = 52.2215, longitude = 6.8937), facing = 270.0),
             apps = listOf(
                 AppConfig(
                     app = App.NpoTv,

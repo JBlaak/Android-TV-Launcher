@@ -1,6 +1,9 @@
 package dev.jblaak.tvlauncher.home
 
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.SunEvent
+import dev.jblaak.tvlauncher.sky.nextSunEvent
+import dev.jblaak.tvlauncher.sky.skyScene
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,14 +50,22 @@ internal class HomeStateHolder(
     }
 
     /**
-     * Moves the clock on at the start of every minute, until cancelled.
+     * Moves the clock, the sky and the sun time on at the start of every minute, until cancelled.
      */
     suspend fun keepTime() {
         while (true) {
             val now = clock.now()
             delay(now.until(now.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1), ChronoUnit.MILLIS))
             val time = clock.now()
-            mutableState.update { it.copy(time = time.minute(), date = time.toLocalDate(), greeting = time.greeting()) }
+            mutableState.update {
+                it.copy(
+                    time = time.minute(),
+                    date = time.toLocalDate(),
+                    greeting = time.greeting(),
+                    sky = skyScene(time.toInstant(), config.window),
+                    sunTime = time.sunTime(),
+                )
+            }
         }
     }
 
@@ -70,7 +81,15 @@ internal class HomeStateHolder(
             time = now.minute(),
             date = now.toLocalDate(),
             greeting = now.greeting(),
+            sky = skyScene(now.toInstant(), config.window),
+            sunTime = now.sunTime(),
         )
+    }
+
+    private fun ZonedDateTime.sunTime(): SunTime? = when (val event = nextSunEvent(this, config.window.location)) {
+        is SunEvent.Sunrise -> SunTime(R.string.sunrise_time, event.at.toLocalTime())
+        is SunEvent.Sunset -> SunTime(R.string.sunset_time, event.at.toLocalTime())
+        null -> null
     }
 
     private fun ZonedDateTime.minute() = toLocalTime().truncatedTo(ChronoUnit.MINUTES)

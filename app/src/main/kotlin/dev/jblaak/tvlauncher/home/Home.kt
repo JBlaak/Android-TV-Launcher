@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,11 +35,12 @@ internal fun Home(
     onLeaveSettings: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF101224)),
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        SkyBackground(
+            scene = state.sky,
+            appGlow = if (state.gearFocused) Color(0xFFB8C0D0) else state.tiles.firstOrNull { it.app == state.focused }?.colors?.glow ?: Color.Transparent,
+            modifier = Modifier.fillMaxSize(),
+        )
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -50,6 +50,7 @@ internal fun Home(
                 time = state.time,
                 date = state.date,
                 greeting = state.greeting,
+                sunTime = state.sunTime,
                 gearFocused = state.gearFocused,
                 onFocusSettings = onFocusSettings,
                 onLeaveSettings = onLeaveSettings,
@@ -116,6 +117,19 @@ internal fun HomePreview(
 internal fun HomeSettingsFocusedPreview() {
     Home(
         state = HomeState.previewValue.copy(focused = App.Netflix, gearFocused = true),
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeNightPreview() {
+    Home(
+        state = HomeState.nightPreviewValue,
         onFocus = {},
         onOpen = {},
         onFocusSettings = {},

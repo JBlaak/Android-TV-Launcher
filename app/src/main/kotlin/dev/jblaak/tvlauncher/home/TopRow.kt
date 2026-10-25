@@ -60,6 +60,7 @@ internal fun TopRow(
     time: LocalTime,
     date: LocalDate,
     @StringRes greeting: Int,
+    sunTime: SunTime?,
     gearFocused: Boolean,
     onFocusSettings: () -> Unit,
     onLeaveSettings: () -> Unit,
@@ -73,7 +74,10 @@ internal fun TopRow(
         verticalAlignment = Alignment.Top,
     ) {
         GreetingAndClock(time = time, date = date, greeting = greeting)
-        SettingsGear(focused = gearFocused, onFocus = onFocusSettings, onLeave = onLeaveSettings, onOpen = onOpenSettings)
+        Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
+            sunTime?.let { WeatherPill(sunTime = it, modifier = Modifier) }
+            SettingsGear(focused = gearFocused, onFocus = onFocusSettings, onLeave = onLeaveSettings, onOpen = onOpenSettings)
+        }
     }
 }
 
@@ -162,6 +166,7 @@ internal fun TopRowPreview() {
             time = HomeState.previewValue.time,
             date = HomeState.previewValue.date,
             greeting = HomeState.previewValue.greeting,
+            sunTime = HomeState.previewValue.sunTime,
             gearFocused = true,
             onFocusSettings = {},
             onLeaveSettings = {},
