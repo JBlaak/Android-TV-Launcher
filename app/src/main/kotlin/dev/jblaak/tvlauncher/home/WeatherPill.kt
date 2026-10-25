@@ -26,10 +26,6 @@ import dev.jblaak.tvlauncher.R
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-/**
- * A glass pill with the weather icon, the condition, the temperature when it's known and the next sunrise or
- * sunset: "Rain 9° · Sunset 17:18". A strong wind replaces the sun time: "Storm 8° · Wind SW 75 km/h".
- */
 @Composable
 internal fun WeatherPill(
     weather: PillWeather,

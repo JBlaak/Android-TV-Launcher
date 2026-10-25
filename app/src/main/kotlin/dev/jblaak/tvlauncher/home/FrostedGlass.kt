@@ -48,12 +48,6 @@ import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.sky.Sun
 import kotlin.math.ceil
 
-/**
- * Frosted glass: the sky behind this element, softly blurred, drawn under the element's own tint. API 31 and up get a
- * real blur of [radius]. The Android 11 TV gets the sky drawn a second time at ⅛ resolution and stretched back up, a
- * cheap blur that stays in step with the animating sky (docs/adr/0001-glass-blur.md). Outside a [SkyBackground] it
- * draws nothing.
- */
 internal fun Modifier.frostedGlass(shape: Shape, radius: Dp): Modifier = this then FrostedGlassElement(shape, radius)
 
 private data class FrostedGlassElement(val shape: Shape, val radius: Dp) : ModifierNodeElement<FrostedGlassNode>() {
@@ -94,8 +88,8 @@ private class FrostedGlassNode(
             val outline = Path().apply { addOutline(shape.createOutline(size, layoutDirection, this@draw)) }
             clipPath(outline) {
                 when (currentValueOf(LocalRendering)) {
-                    Rendering.Api30 -> drawLowResolution(backdrop, window)
-                    Rendering.Api31 -> drawBlurred(backdrop, window)
+                    Rendering.LowResolutionBlur -> drawLowResolution(backdrop, window)
+                    Rendering.RenderEffectBlur -> drawBlurred(backdrop, window)
                 }
             }
         }
@@ -129,9 +123,6 @@ private class FrostedGlassNode(
     }
 }
 
-/**
- * Where this element sits on the sky: its top-left corner in screen pixels, and screen pixels per reference pixel.
- */
 private class SkyWindow(val position: Offset, val scale: Float)
 
 private class LowResolutionSky(val size: IntSize) {

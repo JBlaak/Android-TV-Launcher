@@ -31,8 +31,9 @@ too.
   `app/src/main/res/values-nl/strings.xml`. Lint fails the build when a Dutch translation is missing.
 - Names that are the same in both languages (app names, "NPO 1 · NPO 2 · NPO 3 live") and the Dutch moments
   ("Fijne Koningsdag") live only in `values/` and are marked `translatable="false"`.
-- Every Paparazzi scene runs in English and Dutch: give the snapshot test a `@TestParameter locale: Locale` and use
-  `Television.copy(locale = locale.tag)`, like `HomeSnapshotTests`.
+- Every Paparazzi scene with text runs in English and Dutch: give the snapshot test a `@TestParameter locale: Locale`
+  and use `Television.copy(locale = locale.tag)`, like `HomeSnapshotTests`. Scenes without text, such as the sky
+  snapshots, run in one locale.
 
 ## Install over adb
 

@@ -11,15 +11,15 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.isSuccess
+import io.ktor.serialization.ContentConvertException
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
+import java.io.IOException
+import java.nio.channels.UnresolvedAddressException
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.time.Duration
 
-/**
- * The current weather from Open-Meteo (open-meteo.com), which needs no API key. Any failure, from no network to a
- * response it can't read, comes back as [WeatherFetch.Failed].
- */
 class OpenMeteo(
     engine: HttpClientEngine,
     timeout: Duration,
@@ -36,7 +36,6 @@ class OpenMeteo(
         return WeatherFetch.Fetched(forecast.toCurrentWeather())
     }
 
-    @Suppress("TooGenericExceptionCaught")
     private suspend fun forecastOrNull(location: Location): OpenMeteoForecast? = try {
         val response = client.get("https://api.open-meteo.com/v1/forecast") {
             parameter("latitude", location.latitude)
@@ -44,9 +43,16 @@ class OpenMeteo(
             parameter("current", "temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m")
         }
         if (response.status.isSuccess()) response.body<OpenMeteoForecast>() else null
-    } catch (exception: CancellationException) {
-        throw exception
-    } catch (exception: Exception) {
+    } catch (noConnection: IOException) {
+        logger.log(Level.WARNING, "Open-Meteo can't be reached", noConnection)
+        null
+    } catch (unknownHost: UnresolvedAddressException) {
+        logger.log(Level.WARNING, "Open-Meteo's address can't be resolved", unknownHost)
+        null
+    } catch (unreadable: ContentConvertException) {
+        logger.log(Level.WARNING, "Open-Meteo's forecast can't be read", unreadable)
         null
     }
 }
+
+private val logger = Logger.getLogger("OpenMeteo")

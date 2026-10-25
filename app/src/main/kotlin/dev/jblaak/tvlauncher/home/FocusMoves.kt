@@ -7,10 +7,6 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * The small move a logo makes when its tile gains focus, as a pose for each millisecond since then.
- * [Sparkle] keeps the logo still: Disney+ gets a light sweeping through its name instead, for as long as it has focus.
- */
 internal enum class LogoMove(val durationMillis: Int) {
     Wobble(durationMillis = 1800) {
         private val rotation = Keyframes(900, iterations = 2, EaseInOut, 0f to 0f, 0.25f to -9f, 0.75f to 9f, 1f to 0f)
@@ -68,14 +64,8 @@ internal const val TileBounceMillis = 450
 
 private val tileBounce = Keyframes(TileBounceMillis, iterations = 1, CubicBezierEasing(0.3f, 1.6f, 0.5f, 1f), 0f to 0.94f, 0.6f to 1.05f, 1f to 1f)
 
-/**
- * The scale of a tile that just gained focus: it dips, overshoots and settles.
- */
 internal fun tileBounceAt(millis: Int): Float = tileBounce.valueAt(millis)
 
-/**
- * Values at fractions of one cycle, eased per segment between them as CSS keyframes are.
- */
 private class Keyframes(
     private val cycleMillis: Int,
     private val iterations: Int,

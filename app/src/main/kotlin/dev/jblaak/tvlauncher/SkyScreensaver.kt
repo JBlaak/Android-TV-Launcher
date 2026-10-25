@@ -26,10 +26,6 @@ import dev.jblaak.tvlauncher.weather.SharedPreferencesLastWeather
 import dev.jblaak.tvlauncher.weather.openMeteoWeatherSource
 import kotlinx.coroutines.launch
 
-/**
- * The living sky as the TV's screensaver. It keeps the clock and the weather with the same [HomeStateHolder] as Home,
- * without any apps, and is resumed only while it's dreaming, so the sky animates only while it's shown.
- */
 class SkyScreensaver :
     DreamService(),
     LifecycleOwner,

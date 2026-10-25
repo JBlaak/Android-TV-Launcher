@@ -12,9 +12,6 @@ import dev.jblaak.tvlauncher.sky.MoonPhase
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-/**
- * The moon as on the design canvas, in reference pixels: a radius-24 disc in a 60-unit viewBox shown 64 px wide.
- */
 internal fun DrawScope.drawMoon(moon: Moon) {
     when (moon) {
         is Moon.Disc -> drawDisc(moon)
@@ -45,10 +42,6 @@ private fun DrawScope.drawDisc(moon: Moon.Disc) {
     }
 }
 
-/**
- * The CSS drop-shadow around the lit part, approximated by a blurred disc: a radial fade one standard deviation
- * ([blur]) either side of the rim, faded further by how much of the disc is lit.
- */
 private fun DrawScope.drawShadow(centre: Offset, radius: Float, blur: Float, alpha: Float) {
     val color = Color(245, 240, 215)
     val outer = radius + 3 * blur
@@ -68,10 +61,6 @@ private fun DrawScope.drawShadow(centre: Offset, radius: Float, blur: Float, alp
     )
 }
 
-/**
- * The lit part of a waxing moon: the bright right limb as a semicircle, closed by an elliptical terminator that
- * bulges left once more than half is lit. A waning moon is its mirror image.
- */
 private fun litPart(centre: Offset, radius: Float, phase: MoonPhase): Path {
     val terminator = radius * abs(1 - 2 * phase.litFraction.toFloat())
     val gibbous = phase.litFraction > 0.5

@@ -103,9 +103,6 @@ private fun GreetingAndClock(time: LocalTime, date: LocalDate, greeting: Greetin
     }
 }
 
-/**
- * A round glass button that opens the TV's settings. Down returns to the dock; the other directions stay put.
- */
 @Composable
 private fun SettingsGear(
     focused: Boolean,
@@ -146,9 +143,6 @@ private fun SettingsGear(
     }
 }
 
-/**
- * Idle, a thin glass edge. Focused, a dark gap and then a white ring around the button.
- */
 private fun Modifier.gearRings(focus: Float): Modifier = drawBehind {
     val radius = size.minDimension / 2
     val edge = 0.75.dp.toPx()
@@ -174,5 +168,22 @@ internal fun TopRowPreview() {
             onLeaveSettings = {},
             onOpenSettings = {},
         )
+    }
+}
+
+@Preview
+@Composable
+internal fun GreetingAndClockPreview() {
+    Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
+        GreetingAndClock(time = HomeState.previewValue.time, date = HomeState.previewValue.date, greeting = HomeState.previewValue.greeting)
+    }
+}
+
+@Preview
+@Composable
+internal fun SettingsGearPreview() {
+    Row(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        SettingsGear(focused = false, onFocus = {}, onLeave = {}, onOpen = {})
+        SettingsGear(focused = true, onFocus = {}, onLeave = {}, onOpen = {})
     }
 }

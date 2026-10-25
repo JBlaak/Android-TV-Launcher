@@ -15,6 +15,7 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import java.net.UnknownHostException
+import java.nio.channels.UnresolvedAddressException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -252,6 +253,18 @@ class OpenMeteoTest {
     fun `no network fails the fetch`() = runTest {
         /* Given */
         val openMeteo = createOpenMeteo { throw UnknownHostException("api.open-meteo.com") }
+
+        /* When */
+        val fetch = openMeteo.fetch(enschede)
+
+        /* Then */
+        assertEquals(WeatherFetch.Failed, fetch)
+    }
+
+    @Test
+    fun `an address that can't be resolved fails the fetch`() = runTest {
+        /* Given */
+        val openMeteo = createOpenMeteo { throw UnresolvedAddressException() }
 
         /* When */
         val fetch = openMeteo.fetch(enschede)

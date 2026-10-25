@@ -22,9 +22,6 @@ import kotlin.math.cos
 import kotlin.math.floor
 import kotlin.math.sin
 
-/**
- * Shooting stars and geese as in the canvas mock-up (DockNight, wildlife), in reference pixels.
- */
 internal fun DrawScope.drawSkyLife(life: SkyLife, seconds: Float) {
     if (life.shootingStars) {
         drawMeteor(Offset(0.22f * 1280, 0.09f * 720), Size(170f, 2f), 25f, Color.White.copy(alpha = 0.95f), progress(seconds, 13f, 4f))
@@ -33,10 +30,6 @@ internal fun DrawScope.drawSkyLife(life: SkyLife, seconds: Float) {
     if (life.geese) drawGeese(seconds)
 }
 
-/**
- * A streak that is hidden for most of its [progress] through the loop, flashes in at 87% and slides 340×160 px
- * while it fades out by 93%.
- */
 private fun DrawScope.drawMeteor(topLeft: Offset, size: Size, degrees: Float, head: Color, progress: Float) {
     if (progress < 0.86f || progress >= 0.93f) return
     val alpha = if (progress < 0.87f) (progress - 0.86f) / 0.01f else (0.93f - progress) / 0.06f
@@ -53,10 +46,6 @@ private fun DrawScope.drawMeteor(topLeft: Offset, size: Size, degrees: Float, he
     }
 }
 
-/**
- * Nine geese in a V, flying 1800 px to the left and 150 px up in the first 55% of a 34 s loop, flapping their
- * wings every 0.34 s.
- */
 private fun DrawScope.drawGeese(seconds: Float) {
     val flight = (progress(seconds, 34f, 6f) / 0.55f).coerceAtMost(1f)
     val offset = Offset(-1800f, -150f) * flight
@@ -74,9 +63,6 @@ private fun DrawScope.drawGeese(seconds: Float) {
     }
 }
 
-/**
- * One wing: the arched top edge of a 9×7 px box, squashed vertically by [flap] around its middle.
- */
 private fun DrawScope.drawWing(topLeft: Offset, flap: Float) {
     scale(scaleX = 1f, scaleY = flap, pivot = topLeft + Offset(4.5f, 3.5f)) {
         drawArc(
@@ -91,9 +77,6 @@ private fun DrawScope.drawWing(topLeft: Offset, flap: Float) {
     }
 }
 
-/**
- * The wing's vertical scale, eased between 1 and −0.5 and back every 0.68 s.
- */
 private fun flap(seconds: Float): Float {
     val cycle = seconds / 0.34f
     val leg = cycle - floor(cycle)
@@ -102,17 +85,11 @@ private fun flap(seconds: Float): Float {
     return 1f - 1.5f * eased
 }
 
-/**
- * How far a CSS animation of [period] seconds that started [lead] seconds early is through its loop, 0..1.
- */
 internal fun progress(seconds: Float, period: Float, lead: Float): Float {
     val cycle = (seconds + lead) / period
     return cycle - floor(cycle)
 }
 
-/**
- * The mock-up's deterministic pseudo-random number in 0..1 for seed [index] (rnd).
- */
 private fun seeded(index: Int): Float {
     val value = sin(index * 12.9898 + 78.233) * 43758.5453
     return (value - floor(value)).toFloat()

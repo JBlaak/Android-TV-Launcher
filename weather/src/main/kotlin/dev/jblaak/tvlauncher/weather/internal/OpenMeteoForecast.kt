@@ -21,15 +21,12 @@ internal data class OpenMeteoForecast(
 }
 
 internal fun OpenMeteoForecast.toCurrentWeather(): CurrentWeather = CurrentWeather(
-    weather = weather(current.weatherCode, current.temperature),
+    weather = wmoWeather(current.weatherCode, current.temperature),
     temperature = current.temperature,
     wind = Wind(from = current.windDirection, speed = current.windSpeed, gusts = current.windGusts),
 )
 
-/**
- * WMO weather interpretation codes as Open-Meteo documents them. A clear sky from 25 °C is [SkyWeather.Warm].
- */
-private fun weather(code: Int, temperature: Double): SkyWeather = when (code) {
+private fun wmoWeather(code: Int, temperature: Double): SkyWeather = when (code) {
     2, 3 -> SkyWeather.Clouds
     45, 48 -> SkyWeather.Fog
     in 51..67, in 80..82 -> SkyWeather.Rain

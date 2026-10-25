@@ -163,10 +163,6 @@ private fun RowScope.DockTile(
     }
 }
 
-/**
- * Milliseconds since this tile last gained focus, held at [settledMillis] once the moves are over. A tile that starts
- * out focused doesn't move, so Home opens calm.
- */
 @Composable
 private fun rememberSinceFocus(focused: Boolean, settledMillis: Int): Animatable<Float, AnimationVector1D> {
     val sinceFocus = remember { Animatable(settledMillis.toFloat()) }
@@ -184,10 +180,6 @@ private fun rememberSinceFocus(focused: Boolean, settledMillis: Int): Animatable
     return sinceFocus
 }
 
-/**
- * A light sweeping through the logo, over and over. It tints only the logo's own pixels: a cyan glint through a
- * name, a softer white shine across a banner.
- */
 @Composable
 private fun Modifier.sparkle(logo: TileLogo): Modifier {
     val sweep by rememberInfiniteTransition(label = "sparkle").animateFloat(
@@ -245,10 +237,6 @@ private fun TileLogo(logo: TileLogo, focus: Float) {
     }
 }
 
-/**
- * Idle tiles are dark glass with a faint inner edge. A focused tile fills with the brand gradient at 150°, as CSS
- * draws it, inside a 2 dp white ring.
- */
 private fun Modifier.tileBackground(gradient: List<Color>, focus: Float): Modifier = drawWithCache {
     val radius = 19.5.dp.toPx()
     val angle = 150 * PI / 180
@@ -279,9 +267,6 @@ private fun Modifier.tileBackground(gradient: List<Color>, focus: Float): Modifi
     }
 }
 
-/**
- * OK opens the app when it's released after a short press. A long press does nothing.
- */
 internal fun Modifier.opensOnPress(onOpen: () -> Unit): Modifier = onKeyEvent { event ->
     val confirm = event.key.nativeKeyCode in setOf(KEYCODE_DPAD_CENTER, KEYCODE_ENTER, KEYCODE_NUMPAD_ENTER)
     if (!confirm) return@onKeyEvent false
@@ -298,5 +283,23 @@ internal fun Modifier.opensOnPress(onOpen: () -> Unit): Modifier = onKeyEvent { 
 internal fun DockPreview() {
     Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
         Dock(tiles = HomeState.previewValue.tiles, focused = App.Netflix, onFocus = {}, onOpen = {})
+    }
+}
+
+@Preview(widthDp = 400, heightDp = 140)
+@Composable
+internal fun DockTilePreview() {
+    Row(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp), horizontalArrangement = Arrangement.spacedBy(13.5.dp)) {
+        HomeState.previewValue.tiles.take(2).forEachIndexed { index, tile ->
+            DockTile(tile = tile, focused = index == 0, focusRequester = remember { FocusRequester() }, onFocus = {}, onOpen = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+internal fun TileLogoPreview() {
+    Row(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        HomeState.previewValue.tiles.forEach { TileLogo(logo = it.logo, focus = 0f) }
     }
 }

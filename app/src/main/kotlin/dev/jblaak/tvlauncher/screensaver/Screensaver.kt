@@ -4,7 +4,9 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,10 +37,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
-/**
- * The TV's screensaver: the full sky without the dock, with a small clock and weather line that glides to a new spot
- * every minute.
- */
 @Composable
 internal fun Screensaver(state: HomeState) {
     val spot = driftSpot(LocalDateTime.of(state.date, state.time))
@@ -93,9 +91,6 @@ private fun ClockAndWeather(
     }
 }
 
-/**
- * Places the content at ([x], [y]) of the space left around it, as fractions from 0 to 1.
- */
 private fun Modifier.drift(x: Float, y: Float): Modifier = layout { measurable, constraints ->
     val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
     layout(constraints.maxWidth, constraints.maxHeight) {
@@ -110,4 +105,17 @@ private fun Modifier.drift(x: Float, y: Float): Modifier = layout { measurable, 
 @Composable
 internal fun ScreensaverPreview() {
     Screensaver(state = HomeState.rainPreviewValue)
+}
+
+@Preview
+@Composable
+internal fun ClockAndWeatherPreview() {
+    Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
+        ClockAndWeather(
+            time = HomeState.rainPreviewValue.time,
+            weather = HomeState.rainPreviewValue.weather,
+            sunTime = HomeState.rainPreviewValue.sunTime,
+            modifier = Modifier,
+        )
+    }
 }
