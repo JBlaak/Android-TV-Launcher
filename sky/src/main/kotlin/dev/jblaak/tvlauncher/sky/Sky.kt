@@ -1,19 +1,24 @@
 package dev.jblaak.tvlauncher.sky
 
 import dev.jblaak.tvlauncher.sky.internal.Horizontal
+import dev.jblaak.tvlauncher.sky.internal.SkyWeather
 import dev.jblaak.tvlauncher.sky.internal.WindowPosition
 import dev.jblaak.tvlauncher.sky.internal.project
 import dev.jblaak.tvlauncher.sky.internal.skyKeyframe
+import dev.jblaak.tvlauncher.sky.internal.skyLife
 import dev.jblaak.tvlauncher.sky.internal.sunPosition
 import java.time.Instant
 import kotlin.math.min
 
-fun skyScene(at: Instant, window: Window): SkyScene {
+fun skyScene(at: Instant, window: Window): SkyScene = skyScene(at, window, SkyWeather.Clear)
+
+internal fun skyScene(at: Instant, window: Window, weather: SkyWeather): SkyScene {
     val sun = sunPosition(at, window.location)
     val onScreen = project(sun, window.facing)
     return SkyScene(
         colors = skyColors(sun, onScreen),
         sun = sun(sun, onScreen),
+        life = skyLife(at, sun.elevation, weather),
     )
 }
 

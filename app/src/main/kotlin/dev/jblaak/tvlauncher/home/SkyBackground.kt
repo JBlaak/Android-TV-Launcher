@@ -48,7 +48,7 @@ internal fun SkyBackground(
         return
     }
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(animating = scene.sun is Sun.Disc)
+    val seconds = skyTime(animating = scene.sun is Sun.Disc || scene.life.shootingStars || scene.life.geese)
     val sunPaths = remember { SunPaths() }
     Canvas(modifier = modifier.fillMaxSize()) {
         @Suppress("TooGenericExceptionCaught")
@@ -56,6 +56,7 @@ internal fun SkyBackground(
             scale(size.width / 1280f, pivot = Offset.Zero) {
                 drawSky(scene.colors, glow)
                 drawSun(scene.sun, sunPaths, seconds.value)
+                drawSkyLife(scene.life, seconds.value)
             }
         } catch (exception: RuntimeException) {
             Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
