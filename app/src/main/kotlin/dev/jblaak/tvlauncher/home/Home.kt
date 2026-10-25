@@ -38,6 +38,7 @@ internal fun Home(
     Box(modifier = Modifier.fillMaxSize()) {
         SkyBackground(
             scene = state.sky,
+            celebration = state.celebration,
             appGlow = if (state.gearFocused) Color(0xFFB8C0D0) else state.tiles.firstOrNull { it.app == state.focused }?.colors?.glow ?: Color.Transparent,
             modifier = Modifier.fillMaxSize(),
         )
@@ -130,6 +131,32 @@ internal fun HomeSettingsFocusedPreview() {
 internal fun HomeNightPreview() {
     Home(
         state = HomeState.nightPreviewValue,
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeNewYearsEvePreview() {
+    Home(
+        state = HomeState.newYearsEvePreviewValue,
+        onFocus = {},
+        onOpen = {},
+        onFocusSettings = {},
+        onLeaveSettings = {},
+        onOpenSettings = {},
+    )
+}
+
+@Preview(device = "id:tv_1080p")
+@Composable
+internal fun HomeKingsDayPreview() {
+    Home(
+        state = HomeState.kingsDayPreviewValue,
         onFocus = {},
         onOpen = {},
         onFocusSettings = {},
