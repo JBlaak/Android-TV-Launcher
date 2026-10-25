@@ -60,7 +60,7 @@ Debug builds take a few extras when started from adb, to check the sky on the em
 adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity --es start_time 2026-10-25T17:05
 # Force the API 30 rendering path (no RenderEffect), as on the TV; make run.debug.api30 does this
 adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity --ez force_api30_rendering true
-# Show any weather (clear, warm, cloudy, rain, storm, snow, fog) instead of the live weather, or none at all (offline)
+# Show any weather (clear, warm, clouds, rain, storm, snow, fog) instead of the live weather, or none at all (offline)
 adb shell am start -n dev.jblaak.tvlauncher/.HomeActivity --es weather rain --es temperature 9
 ```
 
