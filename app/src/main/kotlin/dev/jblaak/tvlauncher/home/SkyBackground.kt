@@ -52,7 +52,7 @@ internal fun SkyBackground(
     var failed by remember { mutableStateOf(false) }
     val currentScene by rememberUpdatedState(scene)
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(animating = scene.sun is Sun.Disc)
+    val seconds = skyTime(animating = scene.sun is Sun.Disc || scene.life.shootingStars || scene.life.geese)
     val sunPaths = remember { SunPaths() }
     val backdrop = remember {
         SkyBackdrop {
@@ -61,6 +61,7 @@ internal fun SkyBackground(
             try {
                 drawSky(currentScene.colors, glow)
                 drawSun(currentScene.sun, sunPaths, seconds.value)
+                drawSkyLife(currentScene.life, seconds.value)
             } catch (exception: RuntimeException) {
                 Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
                 failed = true
