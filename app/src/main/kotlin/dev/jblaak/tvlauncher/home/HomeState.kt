@@ -7,17 +7,16 @@ import androidx.compose.ui.unit.Dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.SkyWeather
+import dev.jblaak.tvlauncher.sky.Wind
 import dev.jblaak.tvlauncher.sky.typicalWind
 import dev.jblaak.tvlauncher.weather.CurrentWeather
-import dev.jblaak.tvlauncher.weather.WeatherFetch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import kotlin.math.roundToInt
 
-/**
- * [focused] is the tile focus returns to, also while the gear has the focus.
- */
 internal data class HomeState(
     val tiles: List<Tile>,
     val focused: App?,
@@ -26,9 +25,9 @@ internal data class HomeState(
     val date: LocalDate,
     val greeting: Greeting,
     val celebration: Celebration?,
-    val sky: SkyScene,
+    val sky: SkyScene?,
     val sunTime: SunTime?,
-    val weather: PillWeather,
+    val weather: PillWeather?,
 ) {
     val focusedTile: App? get() = focused.takeUnless { gearFocused }
 
@@ -40,79 +39,90 @@ internal data class HomeState(
         }
 
     companion object {
-        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
+        val previewValue: HomeState = preview(amsterdam(2026, 10, 25, 17, 5), SkyWeather.Clear)
 
-        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 26, 3, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
+        val nightPreviewValue: HomeState = preview(amsterdam(2026, 10, 26, 3, 0), SkyWeather.Clear)
 
-        val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Rain)
+        val rainPreviewValue: HomeState = preview(amsterdam(2026, 10, 25, 17, 5), SkyWeather.Rain)
 
-        val stormPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Storm)
+        val stormPreviewValue: HomeState = preview(amsterdam(2026, 10, 25, 17, 5), SkyWeather.Storm)
 
-        val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
+        val newYearsEvePreviewValue: HomeState = preview(amsterdam(2026, 12, 31, 23, 30), SkyWeather.Clear)
 
-        val kingsDayPreviewValue: HomeState = preview(ZonedDateTime.of(2027, 4, 27, 14, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
+        val kingsDayPreviewValue: HomeState = preview(amsterdam(2027, 4, 27, 14, 0), SkyWeather.Clear)
 
-        private fun preview(time: ZonedDateTime, weather: SkyWeather): HomeState = HomeStateHolder(
-            config = HomeConfig.Enschede,
-            installedApps = object : InstalledApps {
-                override fun isInstalled(packageName: String): Boolean = true
+        private fun preview(time: ZonedDateTime, weather: SkyWeather): HomeState {
+            val tiles = HomeConfig.Enschede.apps.map { it.tile(target = it.targets.first(), banner = null) }
+            val outside = outside(time, HomeConfig.Enschede.window, CurrentWeather(weather, temperature = 9.0, wind = typicalWind(weather)))
+            return HomeState(
+                tiles = tiles,
+                focused = tiles.first().app,
+                gearFocused = false,
+                time = time.toLocalTime().truncatedTo(ChronoUnit.MINUTES),
+                date = time.toLocalDate(),
+                greeting = greeting(time),
+                celebration = celebration(time),
+                sky = outside.sky,
+                sunTime = outside.sunTime,
+                weather = outside.weather,
+            )
+        }
 
-                override fun banner(packageName: String): AppBanner? = null
-            },
-            lastOpenedApp = object : LastOpenedApp {
-                override fun get(): App? = null
-
-                override fun set(app: App) = Unit
-            },
-            clock = object : Clock {
-                override fun now(): ZonedDateTime = time
-            },
-            weatherSource = object : WeatherSource {
-                override suspend fun fetch(): WeatherFetch = WeatherFetch.Failed
-            },
-            lastWeather = object : LastWeather {
-                override fun get(): FetchedWeather = FetchedWeather(
-                    current = CurrentWeather(weather = weather, temperature = 9.0, wind = typicalWind(weather)),
-                    at = time.toInstant(),
-                )
-
-                override fun set(weather: FetchedWeather) = Unit
-            },
-            listener = object : HomeStateHolder.Events {
-                override fun appLaunchRequested(packageName: String) = Unit
-
-                override fun settingsRequested() = Unit
-            },
-        ).state.value
+        private fun amsterdam(year: Int, month: Int, day: Int, hour: Int, minute: Int): ZonedDateTime = ZonedDateTime.of(year, month, day, hour, minute, 0, 0, ZoneId.of("Europe/Amsterdam"))
     }
 }
 
-/**
- * The next sunrise or sunset for the pill: [label] is "Sunrise %s" or "Sunset %s", filled with [time].
- */
 internal data class SunTime(
     @param:StringRes val label: Int,
     val time: LocalTime,
 )
 
-/**
- * The weather half of the pill: an [icon], the [condition] and the [temperature] in whole degrees, which is null
- * when there's no recent weather. A [wind] of 50 km/h or more takes the sun time's place.
- */
 internal data class PillWeather(
     @param:DrawableRes val icon: Int,
     @param:StringRes val condition: Int,
     val temperature: Int?,
     val wind: PillWind?,
-)
+) {
+    companion object {
+        fun of(liveWeather: CurrentWeather?, sunUp: Boolean): PillWeather {
+            val (icon, condition) = when (liveWeather?.weather ?: SkyWeather.Clear) {
+                SkyWeather.Clear -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.clear
+                SkyWeather.Warm -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.warm
+                SkyWeather.Clouds -> R.drawable.ic_weather_cloudy to R.string.cloudy
+                SkyWeather.Rain -> R.drawable.ic_weather_rain to R.string.rain
+                SkyWeather.Storm -> R.drawable.ic_weather_storm to R.string.storm
+                SkyWeather.Snow -> R.drawable.ic_weather_snow to R.string.snow
+                SkyWeather.Fog -> R.drawable.ic_weather_fog to R.string.fog
+            }
+            return PillWeather(
+                icon = icon,
+                condition = condition,
+                temperature = liveWeather?.temperature?.roundToInt(),
+                wind = liveWeather?.wind?.let { PillWind.ofStrong(it) },
+            )
+        }
+    }
+}
 
-/**
- * The wind for the pill: the compass point it blows [from] and its [speed] in whole km/h.
- */
 internal data class PillWind(
     @param:StringRes val from: Int,
     val speed: Int,
-)
+) {
+    companion object {
+        fun ofStrong(wind: Wind): PillWind? = if (wind.speed >= 50) PillWind(compassPoint(wind.from), wind.speed.roundToInt()) else null
+
+        private fun compassPoint(from: Double): Int = listOf(
+            R.string.compass_north,
+            R.string.compass_north_east,
+            R.string.compass_east,
+            R.string.compass_south_east,
+            R.string.compass_south,
+            R.string.compass_south_west,
+            R.string.compass_west,
+            R.string.compass_north_west,
+        )[(from / 45).roundToInt().mod(8)]
+    }
+}
 
 internal data class FocusLabel(
     @param:StringRes val name: Int,
@@ -125,6 +135,18 @@ internal data class Tile(
     @param:StringRes val description: Int,
     val logo: TileLogo,
     val colors: BrandColors,
+)
+
+internal fun AppConfig.tile(target: AppTarget, banner: AppBanner?): Tile = Tile(
+    app = app,
+    name = name,
+    description = target.description,
+    logo = when {
+        logo != null -> TileLogo.Mark(logo, logoSize, logoColors)
+        banner != null -> TileLogo.Banner(banner.painter)
+        else -> TileLogo.Wordmark(name, logoSize, logoColors)
+    },
+    colors = banner?.colors ?: colors,
 )
 
 internal sealed interface TileLogo {

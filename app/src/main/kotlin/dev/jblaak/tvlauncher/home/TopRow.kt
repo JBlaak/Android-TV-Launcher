@@ -59,7 +59,7 @@ internal fun TopRow(
     time: LocalTime,
     date: LocalDate,
     greeting: Greeting,
-    weather: PillWeather,
+    weather: PillWeather?,
     sunTime: SunTime?,
     gearFocused: Boolean,
     onFocusSettings: () -> Unit,
@@ -75,7 +75,7 @@ internal fun TopRow(
     ) {
         GreetingAndClock(time = time, date = date, greeting = greeting)
         Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
-            WeatherPill(weather = weather, sunTime = sunTime, modifier = Modifier)
+            if (weather != null) WeatherPill(weather = weather, sunTime = sunTime, modifier = Modifier)
             SettingsGear(focused = gearFocused, onFocus = onFocusSettings, onLeave = onLeaveSettings, onOpen = onOpenSettings)
         }
     }

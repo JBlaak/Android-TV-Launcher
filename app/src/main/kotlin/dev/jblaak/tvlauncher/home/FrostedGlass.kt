@@ -143,7 +143,7 @@ private class LowResolutionSky(val size: IntSize) {
 private fun DrawScope.drawSky(backdrop: SkyBackdrop, window: SkyWindow) {
     translate(-window.position.x, -window.position.y) {
         scale(window.scale, pivot = Offset.Zero) {
-            with(backdrop) { drawReference() }
+            with(backdrop) { drawInReferencePixels() }
         }
     }
 }
@@ -151,7 +151,7 @@ private fun DrawScope.drawSky(backdrop: SkyBackdrop, window: SkyWindow) {
 @Preview(device = "id:tv_1080p")
 @Composable
 internal fun FrostedGlassPreview() {
-    val scene = HomeState.previewValue.sky
+    val scene = checkNotNull(HomeState.previewValue.sky)
     val sun = (scene.sun as Sun.Disc).position
     SkyBackground(scene = scene, celebration = null, appGlow = Color(0xFFE50914), modifier = Modifier.fillMaxSize()) {
         Box(

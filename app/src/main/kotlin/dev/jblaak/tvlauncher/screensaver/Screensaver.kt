@@ -65,7 +65,7 @@ internal fun Screensaver(state: HomeState) {
 @Composable
 private fun ClockAndWeather(
     time: LocalTime,
-    weather: PillWeather,
+    weather: PillWeather?,
     sunTime: SunTime?,
     modifier: Modifier,
 ) {
@@ -76,17 +76,19 @@ private fun ClockAndWeather(
             text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
             style = TextStyle(color = Color.White, fontSize = 54.sp, fontWeight = FontWeight.Light, letterSpacing = (-2.25).sp, shadow = shadow),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(7.5.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(weather.icon),
-                contentDescription = null,
-                modifier = Modifier.size(16.5.dp),
-                colorFilter = ColorFilter.tint(color),
-            )
-            BasicText(
-                text = pillText(weather, sunTime),
-                style = TextStyle(color = color, fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
-            )
+        if (weather != null) {
+            Row(horizontalArrangement = Arrangement.spacedBy(7.5.dp), verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(weather.icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.5.dp),
+                    colorFilter = ColorFilter.tint(color),
+                )
+                BasicText(
+                    text = pillText(weather, sunTime),
+                    style = TextStyle(color = color, fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
+                )
+            }
         }
     }
 }

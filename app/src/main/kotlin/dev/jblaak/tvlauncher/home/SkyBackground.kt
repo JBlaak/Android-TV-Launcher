@@ -1,6 +1,5 @@
 package dev.jblaak.tvlauncher.home
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -12,11 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
@@ -37,57 +34,20 @@ import dev.jblaak.tvlauncher.sky.Sun
 import dev.jblaak.tvlauncher.sky.WeatherEffects
 import kotlinx.coroutines.delay
 
-/**
- * The living sky behind Home, drawn on one Canvas, with [content] on top. It animates at up to 30 fps, and only while
- * Home is resumed. If drawing ever fails, it falls back to the plain night-blue background for good.
- *
- * The same drawing is offered to [content] as [LocalSkyBackdrop], so frosted glass can show the sky behind it.
- */
 @Composable
 internal fun SkyBackground(
-    scene: SkyScene,
+    scene: SkyScene?,
     celebration: Celebration?,
     appGlow: Color,
     modifier: Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    var failed by remember { mutableStateOf(false) }
-    val currentScene by rememberUpdatedState(scene)
-    val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(
-        animating = scene.sun is Sun.Disc ||
-            scene.effects != WeatherEffects.None ||
-            scene.glass.beads.any { it.slide != null } ||
-            scene.life.shootingStars ||
-            scene.life.geese ||
-            celebration != null,
-    )
-    val sunPaths = remember { SunPaths() }
-    val celebrationLayers by rememberUpdatedState(remember(celebration) { celebration?.let { CelebrationLayers(it) } })
-    val backdrop = remember {
-        SkyBackdrop {
-            if (failed) return@SkyBackdrop
-            @Suppress("TooGenericExceptionCaught")
-            try {
-                drawSky(currentScene.colors, glow)
-                drawSun(currentScene.sun, sunPaths, seconds.value)
-                drawStars(currentScene.effects.stars, seconds.value)
-                drawMoon(currentScene.moon)
-                drawSkyLife(currentScene.life, seconds.value)
-                drawWeather(currentScene.effects, seconds.value)
-                celebrationLayers?.let { drawCelebration(it, seconds.value) }
-                drawWindowGlass(currentScene.glass, seconds.value)
-            } catch (exception: RuntimeException) {
-                Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)
-                failed = true
-            }
-        }
-    }
     Box(modifier = modifier.background(Color(0xFF101224))) {
-        if (!failed) {
+        val backdrop = scene?.let { rememberLivingSky(it, celebration, appGlow) }
+        if (backdrop != null) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 scale(size.width / 1280f, pivot = Offset.Zero) {
-                    with(backdrop) { drawReference() }
+                    with(backdrop) { drawInReferencePixels() }
                 }
             }
         }
@@ -97,24 +57,42 @@ internal fun SkyBackground(
     }
 }
 
-/**
- * The sky as glass sees it: the same layers as [SkyBackground], in 1280×720 reference pixels.
- */
-internal fun interface SkyBackdrop {
-    fun DrawScope.drawReference()
+@Composable
+private fun rememberLivingSky(scene: SkyScene, celebration: Celebration?, appGlow: Color): SkyBackdrop {
+    val currentScene by rememberUpdatedState(scene)
+    val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
+    val seconds = secondsWhileResumed(
+        animating = scene.sun is Sun.Disc ||
+            scene.effects != WeatherEffects.None ||
+            scene.glass.beads.any { it.slide != null } ||
+            scene.life.shootingStars ||
+            scene.life.geese ||
+            celebration != null,
+    )
+    val sunPaths = remember { SunPaths() }
+    val celebrationLayers by rememberUpdatedState(remember(celebration) { celebration?.let { CelebrationLayers(it) } })
+    return remember {
+        SkyBackdrop {
+            drawSky(currentScene.colors, glow)
+            drawSun(currentScene.sun, sunPaths, seconds.value)
+            drawStars(currentScene.effects.stars, seconds.value)
+            drawMoon(currentScene.moon)
+            drawSkyLife(currentScene.life, seconds.value)
+            drawWeather(currentScene.effects, seconds.value)
+            celebrationLayers?.let { drawCelebration(it, seconds.value) }
+            drawWindowGlass(currentScene.glass, seconds.value)
+        }
+    }
 }
 
-/**
- * The sky behind the content, or null outside a [SkyBackground].
- */
+internal fun interface SkyBackdrop {
+    fun DrawScope.drawInReferencePixels()
+}
+
 internal val LocalSkyBackdrop = staticCompositionLocalOf<SkyBackdrop?> { null }
 
-/**
- * Seconds of animation since Home first showed, advanced by frames at most 30 times a second while Home is
- * resumed. Time stands still while another app is in front.
- */
 @Composable
-private fun skyTime(animating: Boolean): State<Float> {
+private fun secondsWhileResumed(animating: Boolean): State<Float> {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     return produceState(0f, animating, lifecycle) {
         if (!animating) return@produceState
@@ -130,10 +108,6 @@ private fun skyTime(animating: Boolean): State<Float> {
     }
 }
 
-/**
- * Back to front: the base colour, the cool glow, the warm glow and the focused app's glow from below
- * (radial gradients sized in % of the 1280×720 reference, as in the v1 mock-up).
- */
 private fun DrawScope.drawSky(colors: SkyColors, appGlow: Color) {
     drawRect(colors.base.toColor(1.0))
     drawEllipticalGlow(
