@@ -39,6 +39,7 @@ internal fun WeatherPill(
     val color = Color.White.copy(alpha = 0.85f)
     Row(
         modifier = modifier
+            .frostedGlass(CircleShape, radius = 26.dp)
             .background(Color.White.copy(alpha = 0.08f), CircleShape)
             .border(0.75.dp, Color.White.copy(alpha = 0.16f), CircleShape)
             .padding(horizontal = 15.dp, vertical = 9.dp),
