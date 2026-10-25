@@ -22,6 +22,18 @@ make snapshots.record  # re-record the Paparazzi snapshots after a UI change
 
 Paparazzi snapshots are committed in `app/src/test/snapshots`.
 
+## Languages
+
+The launcher follows the TV's language: Dutch when the TV is set to Dutch, English otherwise. Dates follow the locale
+too.
+
+- Every string has an English version in `app/src/main/res/values/strings.xml` and a Dutch one in
+  `app/src/main/res/values-nl/strings.xml`. Lint fails the build when a Dutch translation is missing.
+- Names that are the same in both languages (app names, "NPO 1 · NPO 2 · NPO 3 live") and the Dutch moments
+  ("Fijne Koningsdag") live only in `values/` and are marked `translatable="false"`.
+- Every Paparazzi scene runs in English and Dutch: give the snapshot test a `@TestParameter locale: Locale` and use
+  `Television.copy(locale = locale.tag)`, like `HomeSnapshotTests`.
+
 ## Install over adb
 
 Connect to the TV first (`adb connect <tv-ip>:5555`). With more than one device attached, point every command at the

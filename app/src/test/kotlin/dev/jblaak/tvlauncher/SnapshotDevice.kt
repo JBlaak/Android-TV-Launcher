@@ -33,6 +33,6 @@ internal val Television = DeviceConfig(
 )
 
 internal enum class Locale(val tag: String) {
-    English("en"),
+    English("en-rGB"),
     Dutch("nl"),
 }

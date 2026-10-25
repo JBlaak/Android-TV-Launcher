@@ -10,6 +10,10 @@ android {
     defaultConfig {
         applicationId = "dev.jblaak.tvlauncher"
     }
+
+    androidResources {
+        localeFilters += listOf("en", "nl")
+    }
 }
 
 dependencies {

@@ -1,5 +1,6 @@
 package dev.jblaak.tvlauncher.home
 
+import android.text.format.DateFormat
 import android.view.KeyEvent.KEYCODE_DPAD_DOWN
 import android.view.KeyEvent.KEYCODE_DPAD_LEFT
 import android.view.KeyEvent.KEYCODE_DPAD_RIGHT
@@ -83,7 +84,7 @@ internal fun TopRow(
 @Composable
 private fun GreetingAndClock(time: LocalTime, date: LocalDate, @StringRes greeting: Int) {
     val locale = LocalConfiguration.current.locales[0]
-    val dateFormat = remember(locale) { DateTimeFormatter.ofPattern("EEE d MMM", locale) }
+    val dateFormat = remember(locale) { DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEdMMM"), locale) }
     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
         BasicText(
             text = stringResource(R.string.greeting_and_date, stringResource(greeting), date.format(dateFormat)),
