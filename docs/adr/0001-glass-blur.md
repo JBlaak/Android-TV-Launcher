@@ -26,6 +26,17 @@ Measured on the `TV_Launcher_API31` emulator, Home at 17:05 with the sun and ray
 
 Both hold the 30 fps cap from #5.
 
+With every layer in place (#16), a storm at dusk is the heaviest scene: 25 Oct 17:30, storm with SW 75 km/h, so 90 drops, 3 rain curtains, 9 scud clouds, leaves, lightning and 30 window beads, each drawn once for the screen and once per glass element. Same emulator, 10 s of `dumpsys gfxinfo`, debug build:
+
+| Path | Scene | Frames | Janky | 50th / 90th / 99th percentile |
+| --- | --- | --- | --- | --- |
+| API 31: `RenderEffect` blur | sky only | 320 | 0 | 10 / 14 / 18 ms |
+| API 30 (forced): ⅛-resolution copy | sky only | 310 | 0 | 10 / 13 / 16 ms |
+| API 31: `RenderEffect` blur | moving focus along the dock every 0.5 s | 640 | 0 | 18 / 20 / 22 ms |
+| API 30 (forced): ⅛-resolution copy | moving focus along the dock every 0.5 s | 636 | 0 | 18 / 19 / 21 ms |
+
+The sky holds its ~30 fps with no janky frames on either path, and the dock's focus moves add frames at the display rate on top. These are emulator numbers: they don't reflect the TV's MediaTek GPU, so the particle counts are unchanged. The TV measurement is on #17.
+
 ## Decision
 
 We don't add Haze. `Modifier.frostedGlass(shape, radius)` draws the sky behind the element itself, on both paths. Only the blur step differs, chosen by `LocalRendering`:
@@ -38,6 +49,7 @@ We don't add Haze. `Modifier.frostedGlass(shape, radius)` draws the sky behind t
 ## Consequences
 
 - The glass never lags the sky and adds no dependency. RenderScript isn't used.
+- Every sky layer must draw in the 1280×720 reference pixels, full-screen fills included (`ReferenceSize`). A fill that relies on the `DrawScope`'s own size covers the screen in the sky Canvas but only a corner of the copy behind the glass, which leaves the copy see-through: until #16 the sky's base colour did this, so rain and beads showed sharply through the dock.
 - The sky is drawn once more per glass element per frame: three times at ⅛ resolution on the TV. The cost grows with every sky layer, so heavy particle layers should be checked behind the glass too.
 - ⅛ resolution is a weaker blur than the mock-up's 20–30 px: rays and stars soften, but the sun's core stays recognisable behind the dock. If it looks too sharp on the TV, a smaller copy (1/12, 1/16) is a one-number change.
 - Still to measure on the TV (#17): the frame rate on Home with the sun animating behind the dock, and whether the glass looks right. If the ⅛ copy turns out too expensive there, revisit Haze's RenderScript path with that measurement.

@@ -228,6 +228,7 @@ private fun TileLogo(logo: TileLogo, focus: Float) {
         is TileLogo.Wordmark -> BasicText(
             text = stringResource(logo.name),
             style = TextStyle(
+                fontFamily = Figtree,
                 color = logo.colors?.let { lerp(it.idle, it.focused, focus) } ?: Color.White,
                 fontSize = logo.size.value.sp,
                 fontWeight = FontWeight.ExtraBold,

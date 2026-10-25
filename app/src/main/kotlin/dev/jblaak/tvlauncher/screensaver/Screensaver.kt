@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.jblaak.tvlauncher.home.Figtree
 import dev.jblaak.tvlauncher.home.HomeState
 import dev.jblaak.tvlauncher.home.PillWeather
 import dev.jblaak.tvlauncher.home.SkyBackground
@@ -72,7 +73,7 @@ private fun ClockAndWeather(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         BasicText(
             text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
-            style = TextStyle(color = Color.White, fontSize = 54.sp, fontWeight = FontWeight.Light, letterSpacing = (-2.25).sp, shadow = shadow),
+            style = TextStyle(fontFamily = Figtree, color = Color.White, fontSize = 54.sp, fontWeight = FontWeight.Light, letterSpacing = (-2.25).sp, shadow = shadow),
         )
         if (weather != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(7.5.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -84,7 +85,7 @@ private fun ClockAndWeather(
                 )
                 BasicText(
                     text = pillText(weather, sunTime),
-                    style = TextStyle(color = color, fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
+                    style = TextStyle(fontFamily = Figtree, color = color, fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
                 )
             }
         }
