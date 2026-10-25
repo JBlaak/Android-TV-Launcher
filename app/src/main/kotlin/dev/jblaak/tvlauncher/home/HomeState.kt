@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.Dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.SkyWeather
-import dev.jblaak.tvlauncher.sky.Wind
+import dev.jblaak.tvlauncher.sky.typicalWind
 import dev.jblaak.tvlauncher.weather.CurrentWeather
 import dev.jblaak.tvlauncher.weather.WeatherFetch
 import java.time.LocalDate
@@ -46,6 +46,8 @@ internal data class HomeState(
 
         val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Rain)
 
+        val stormPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Storm)
+
         val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
 
         val kingsDayPreviewValue: HomeState = preview(ZonedDateTime.of(2027, 4, 27, 14, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
@@ -70,7 +72,7 @@ internal data class HomeState(
             },
             lastWeather = object : LastWeather {
                 override fun get(): FetchedWeather = FetchedWeather(
-                    current = CurrentWeather(weather = weather, temperature = 9.0, wind = Wind(from = 225.0, speed = 20.0, gusts = 35.0)),
+                    current = CurrentWeather(weather = weather, temperature = 9.0, wind = typicalWind(weather)),
                     at = time.toInstant(),
                 )
 
@@ -95,12 +97,21 @@ internal data class SunTime(
 
 /**
  * The weather half of the pill: an [icon], the [condition] and the [temperature] in whole degrees, which is null
- * when there's no recent weather.
+ * when there's no recent weather. A [wind] of 50 km/h or more takes the sun time's place.
  */
 internal data class PillWeather(
     @param:DrawableRes val icon: Int,
     @param:StringRes val condition: Int,
     val temperature: Int?,
+    val wind: PillWind?,
+)
+
+/**
+ * The wind for the pill: the compass point it blows [from] and its [speed] in whole km/h.
+ */
+internal data class PillWind(
+    @param:StringRes val from: Int,
+    val speed: Int,
 )
 
 internal data class FocusLabel(

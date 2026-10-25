@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter
 
 /**
  * A glass pill with the weather icon, the condition, the temperature when it's known and the next sunrise or
- * sunset: "Rain 9° · Sunset 17:18".
+ * sunset: "Rain 9° · Sunset 17:18". A strong wind replaces the sun time: "Storm 8° · Wind SW 75 km/h".
  */
 @Composable
 internal fun WeatherPill(
@@ -63,8 +63,9 @@ internal fun WeatherPill(
 internal fun pillText(weather: PillWeather, sunTime: SunTime?): String {
     val condition = stringResource(weather.condition)
     val conditionAndTemperature = weather.temperature?.let { stringResource(R.string.condition_and_temperature, condition, it) } ?: condition
-    val sun = sunTime?.let { stringResource(it.label, it.time.format(DateTimeFormatter.ofPattern("HH:mm"))) }
-    return sun?.let { stringResource(R.string.dot_separated, conditionAndTemperature, it) } ?: conditionAndTemperature
+    val tail = weather.wind?.let { stringResource(R.string.wind_from_speed, stringResource(it.from), it.speed) }
+        ?: sunTime?.let { stringResource(it.label, it.time.format(DateTimeFormatter.ofPattern("HH:mm"))) }
+    return tail?.let { stringResource(R.string.dot_separated, conditionAndTemperature, it) } ?: conditionAndTemperature
 }
 
 @Preview
@@ -72,7 +73,7 @@ internal fun pillText(weather: PillWeather, sunTime: SunTime?): String {
 internal fun WeatherPillPreview() {
     Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
         WeatherPill(
-            weather = PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9),
+            weather = PillWeather(R.drawable.ic_weather_rain, R.string.rain, temperature = 9, wind = null),
             sunTime = SunTime(R.string.sunset_time, LocalTime.of(17, 18)),
             modifier = Modifier,
         )
@@ -84,8 +85,20 @@ internal fun WeatherPillPreview() {
 internal fun WeatherPillWithoutTemperaturePreview() {
     Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
         WeatherPill(
-            weather = PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null),
+            weather = PillWeather(R.drawable.ic_weather_moon, R.string.clear, temperature = null, wind = null),
             sunTime = SunTime(R.string.sunrise_time, LocalTime.of(7, 16)),
+            modifier = Modifier,
+        )
+    }
+}
+
+@Preview
+@Composable
+internal fun WeatherPillWithWindPreview() {
+    Box(modifier = Modifier.background(Color(0xFF101224)).padding(20.dp)) {
+        WeatherPill(
+            weather = PillWeather(R.drawable.ic_weather_storm, R.string.storm, temperature = 8, wind = PillWind(R.string.compass_south_west, 75)),
+            sunTime = SunTime(R.string.sunset_time, LocalTime.of(17, 18)),
             modifier = Modifier,
         )
     }

@@ -6,6 +6,14 @@
     <string name="clocks_went_back">Clocks went back · enjoy the extra hour</string>
     <string name="clocks_went_forward">Clocks went forward · an hour shorter night</string>
     <string name="cloudy">Cloudy</string>
+    <string name="compass_east">E</string>
+    <string name="compass_north">N</string>
+    <string name="compass_north_east">NE</string>
+    <string name="compass_north_west">NW</string>
+    <string name="compass_south">S</string>
+    <string name="compass_south_east">SE</string>
+    <string name="compass_south_west">SW</string>
+    <string name="compass_west">W</string>
     <string name="condition_and_temperature" translatable="false">%1$s %2$d°</string>
     <string name="disney_plus" translatable="false">Disney+</string>
     <string name="dot_separated" translatable="false">%1$s · %2$s</string>
@@ -32,6 +40,7 @@
     <string name="sunrise_time">Sunrise %1$s</string>
     <string name="sunset_time">Sunset %1$s</string>
     <string name="warm">Warm</string>
+    <string name="wind_from_speed">Wind %1$s %2$d km/h</string>
     <string name="your_library">Your library</string>
     <string name="your_library_via_plezy">Your library · via Plezy</string>
     <string name="youtube" translatable="false">YouTube</string>

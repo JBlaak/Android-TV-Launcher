@@ -34,6 +34,7 @@ import dev.jblaak.tvlauncher.sky.ScreenPoint
 import dev.jblaak.tvlauncher.sky.SkyColors
 import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.Sun
+import dev.jblaak.tvlauncher.sky.WeatherEffects
 import kotlinx.coroutines.delay
 
 /**
@@ -53,7 +54,13 @@ internal fun SkyBackground(
     var failed by remember { mutableStateOf(false) }
     val currentScene by rememberUpdatedState(scene)
     val glow by animateColorAsState(appGlow, tween(300), label = "app glow")
-    val seconds = skyTime(animating = scene.sun is Sun.Disc || scene.life.shootingStars || scene.life.geese || celebration != null)
+    val seconds = skyTime(
+        animating = scene.sun is Sun.Disc ||
+            scene.effects != WeatherEffects.None ||
+            scene.life.shootingStars ||
+            scene.life.geese ||
+            celebration != null,
+    )
     val sunPaths = remember { SunPaths() }
     val celebrationLayers by rememberUpdatedState(remember(celebration) { celebration?.let { CelebrationLayers(it) } })
     val backdrop = remember {
@@ -63,8 +70,10 @@ internal fun SkyBackground(
             try {
                 drawSky(currentScene.colors, glow)
                 drawSun(currentScene.sun, sunPaths, seconds.value)
+                drawStars(currentScene.effects.stars, seconds.value)
                 drawMoon(currentScene.moon)
                 drawSkyLife(currentScene.life, seconds.value)
+                drawWeather(currentScene.effects, seconds.value)
                 celebrationLayers?.let { drawCelebration(it, seconds.value) }
             } catch (exception: RuntimeException) {
                 Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)

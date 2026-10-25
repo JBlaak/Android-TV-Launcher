@@ -105,7 +105,7 @@ private fun flap(seconds: Float): Float {
 /**
  * How far a CSS animation of [period] seconds that started [lead] seconds early is through its loop, 0..1.
  */
-private fun progress(seconds: Float, period: Float, lead: Float): Float {
+internal fun progress(seconds: Float, period: Float, lead: Float): Float {
     val cycle = (seconds + lead) / period
     return cycle - floor(cycle)
 }

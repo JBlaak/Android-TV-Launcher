@@ -30,4 +30,9 @@ internal class WeatherPillSnapshotTests(
     fun `a clear night without a temperature`() {
         paparazzi.snapshot { WeatherPillWithoutTemperaturePreview() }
     }
+
+    @Test
+    fun `a storm with a strong wind instead of the sunset`() {
+        paparazzi.snapshot { WeatherPillWithWindPreview() }
+    }
 }

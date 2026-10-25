@@ -5,6 +5,14 @@
     <string name="clocks_went_back">De klok is teruggezet · geniet van het extra uur</string>
     <string name="clocks_went_forward">De klok is vooruitgezet · een uur kortere nacht</string>
     <string name="cloudy">Bewolkt</string>
+    <string name="compass_east">O</string>
+    <string name="compass_north">N</string>
+    <string name="compass_north_east">NO</string>
+    <string name="compass_north_west">NW</string>
+    <string name="compass_south">Z</string>
+    <string name="compass_south_east">ZO</string>
+    <string name="compass_south_west">ZW</string>
+    <string name="compass_west">W</string>
     <string name="fog">Mist</string>
     <string name="good_afternoon">Goedemiddag</string>
     <string name="good_evening">Goedenavond</string>
@@ -23,6 +31,7 @@
     <string name="sunrise_time">Zonsopkomst %1$s</string>
     <string name="sunset_time">Zonsondergang %1$s</string>
     <string name="warm">Warm</string>
+    <string name="wind_from_speed">Wind %1$s %2$d km/u</string>
     <string name="your_library">Je bibliotheek</string>
     <string name="your_library_via_plezy">Je bibliotheek · via Plezy</string>
 </resources>
