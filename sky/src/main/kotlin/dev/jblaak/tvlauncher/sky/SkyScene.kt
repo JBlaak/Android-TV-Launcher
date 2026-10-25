@@ -7,6 +7,7 @@ package dev.jblaak.tvlauncher.sky
 data class SkyScene(
     val colors: SkyColors,
     val sun: Sun,
+    val moon: Moon,
 )
 
 /**
@@ -57,4 +58,26 @@ sealed interface Sun {
 data class SunColors(
     val glow: Rgb,
     val core: Rgb,
+)
+
+sealed interface Moon {
+
+    data class Disc(
+        val position: ScreenPoint,
+        val opacity: Double,
+        val phase: MoonPhase,
+    ) : Moon
+
+    data class Glow(
+        val position: ScreenPoint,
+        val opacity: Double,
+    ) : Moon
+
+    data object Hidden : Moon
+}
+
+data class MoonPhase(
+    val ageInDays: Double,
+    val litFraction: Double,
+    val waxing: Boolean,
 )

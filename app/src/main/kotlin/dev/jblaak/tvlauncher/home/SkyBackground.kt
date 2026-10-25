@@ -56,6 +56,7 @@ internal fun SkyBackground(
             scale(size.width / 1280f, pivot = Offset.Zero) {
                 drawSky(scene.colors, glow)
                 drawSun(scene.sun, sunPaths, seconds.value)
+                drawMoon(scene.moon)
             }
         } catch (exception: RuntimeException) {
             Log.e("SkyBackground", "The sky failed to draw, falling back to a plain background", exception)

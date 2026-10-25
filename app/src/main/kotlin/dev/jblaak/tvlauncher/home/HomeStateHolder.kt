@@ -1,7 +1,9 @@
 package dev.jblaak.tvlauncher.home
 
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.SkyScene
 import dev.jblaak.tvlauncher.sky.SunEvent
+import dev.jblaak.tvlauncher.sky.WeatherType
 import dev.jblaak.tvlauncher.sky.nextSunEvent
 import dev.jblaak.tvlauncher.sky.skyScene
 import kotlinx.coroutines.delay
@@ -62,7 +64,7 @@ internal class HomeStateHolder(
                     time = time.minute(),
                     date = time.toLocalDate(),
                     greeting = time.greeting(),
-                    sky = skyScene(time.toInstant(), config.window),
+                    sky = time.sky(),
                     sunTime = time.sunTime(),
                 )
             }
@@ -81,10 +83,12 @@ internal class HomeStateHolder(
             time = now.minute(),
             date = now.toLocalDate(),
             greeting = now.greeting(),
-            sky = skyScene(now.toInstant(), config.window),
+            sky = now.sky(),
             sunTime = now.sunTime(),
         )
     }
+
+    private fun ZonedDateTime.sky(): SkyScene = skyScene(toInstant(), config.window, WeatherType.Clear)
 
     private fun ZonedDateTime.sunTime(): SunTime? = when (val event = nextSunEvent(this, config.window.location)) {
         is SunEvent.Sunrise -> SunTime(R.string.sunrise_time, event.at.toLocalTime())
