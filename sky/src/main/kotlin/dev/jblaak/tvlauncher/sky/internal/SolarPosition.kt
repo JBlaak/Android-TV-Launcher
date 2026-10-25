@@ -33,12 +33,12 @@ internal fun sunPosition(instant: Instant, location: Location): Horizontal {
 /**
  * Days since J2000.0 (2000-01-01 12:00 UTC).
  */
-private fun daysSinceJ2000(instant: Instant): Double = instant.toEpochMilli() / 86_400_000.0 - 10957.5
+internal fun daysSinceJ2000(instant: Instant): Double = instant.toEpochMilli() / 86_400_000.0 - 10957.5
 
 /**
  * Equatorial to horizontal coordinates, with the local sidereal time from GMST plus the longitude.
  */
-private fun horizontal(d: Double, rightAscension: Double, declination: Double, location: Location): Horizontal {
+internal fun horizontal(d: Double, rightAscension: Double, declination: Double, location: Location): Horizontal {
     val latitude = Math.toRadians(location.latitude)
     val siderealTime = Math.toRadians((18.697374558 + 24.06570982441908 * d) * 15 + location.longitude)
     val hourAngle = siderealTime - rightAscension

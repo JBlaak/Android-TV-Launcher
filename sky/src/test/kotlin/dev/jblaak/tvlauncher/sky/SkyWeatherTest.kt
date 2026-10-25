@@ -13,7 +13,7 @@ class SkyWeatherTest {
     @Test
     fun `rain pulls the sky toward grey-blue`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Rain)
+        val scene = skyScene(evening, westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(clearEvening.colors.base.towards(Rgb(22, 30, 42), 0.6), scene.colors.base)
@@ -22,7 +22,7 @@ class SkyWeatherTest {
     @Test
     fun `rain greys the warm glow`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Rain)
+        val scene = skyScene(evening, westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(clearEvening.colors.warm.towards(Rgb(90, 115, 145), 0.6), scene.colors.warm)
@@ -31,7 +31,7 @@ class SkyWeatherTest {
     @Test
     fun `rain greys the cool glow`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Rain)
+        val scene = skyScene(evening, westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(clearEvening.colors.cool.towards(Rgb(90, 115, 145), 0.6), scene.colors.cool)
@@ -40,7 +40,7 @@ class SkyWeatherTest {
     @Test
     fun `rain dims the glows`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Rain)
+        val scene = skyScene(evening, westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(clearEvening.colors.strength * 0.6, scene.colors.strength, 1e-9)
@@ -49,7 +49,7 @@ class SkyWeatherTest {
     @Test
     fun `snow cools the sky`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Snow)
+        val scene = skyScene(evening, westWindow, SkyWeather.Snow)
 
         /* Then */
         assertEquals(clearEvening.colors.base.towards(Rgb(50, 58, 76), 0.55), scene.colors.base)
@@ -58,7 +58,7 @@ class SkyWeatherTest {
     @Test
     fun `warmth turns the glows amber`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Warm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Warm)
 
         /* Then */
         assertEquals(clearEvening.colors.warm.towards(Rgb(255, 160, 70), 0.35), scene.colors.warm)
@@ -67,7 +67,7 @@ class SkyWeatherTest {
     @Test
     fun `warmth strengthens the glows`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Warm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Warm)
 
         /* Then */
         assertEquals(clearEvening.colors.strength * 1.2, scene.colors.strength, 1e-9)
@@ -76,7 +76,7 @@ class SkyWeatherTest {
     @Test
     fun `clouds grey the sky`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Cloudy)
+        val scene = skyScene(evening, westWindow, SkyWeather.Clouds)
 
         /* Then */
         assertEquals(clearEvening.colors.base.towards(Rgb(40, 44, 52), 0.5), scene.colors.base)
@@ -85,7 +85,7 @@ class SkyWeatherTest {
     @Test
     fun `a storm darkens the sky toward violet-grey`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Storm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Storm)
 
         /* Then */
         assertEquals(clearEvening.colors.base.towards(Rgb(16, 16, 28), 0.7), scene.colors.base)
@@ -94,7 +94,7 @@ class SkyWeatherTest {
     @Test
     fun `fog pales the sky`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Fog)
+        val scene = skyScene(evening, westWindow, SkyWeather.Fog)
 
         /* Then */
         assertEquals(clearEvening.colors.base.towards(Rgb(46, 50, 58), 0.6), scene.colors.base)
@@ -103,7 +103,7 @@ class SkyWeatherTest {
     @Test
     fun `a storm leaves the warm glow where the sun puts it`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Storm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Storm)
 
         /* Then */
         assertEquals(clearEvening.colors.warmCentre, scene.colors.warmCentre)
@@ -112,7 +112,7 @@ class SkyWeatherTest {
     @Test
     fun `in warm weather the sun burns brighter`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Warm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Warm)
 
         /* Then */
         val sun = assertIs<Sun.Disc>(scene.sun)
@@ -122,7 +122,7 @@ class SkyWeatherTest {
     @Test
     fun `behind clouds a sun fully in view is only a soft glow`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Cloudy)
+        val scene = skyScene(evening, westWindow, SkyWeather.Clouds)
 
         /* Then */
         assertEquals(0.18, assertIs<Sun.Diffuse>(scene.sun).opacity, 1e-9)
@@ -131,7 +131,7 @@ class SkyWeatherTest {
     @Test
     fun `in rain the sun's glow is fainter`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Rain)
+        val scene = skyScene(evening, westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(0.08, assertIs<Sun.Diffuse>(scene.sun).opacity, 1e-9)
@@ -140,7 +140,7 @@ class SkyWeatherTest {
     @Test
     fun `the sun's glow sits where the sun is`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Fog)
+        val scene = skyScene(evening, westWindow, SkyWeather.Fog)
 
         /* Then */
         assertEquals((clearEvening.sun as Sun.Disc).position, assertIs<Sun.Diffuse>(scene.sun).position)
@@ -149,7 +149,7 @@ class SkyWeatherTest {
     @Test
     fun `a storm hides the sun`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Storm)
+        val scene = skyScene(evening, westWindow, SkyWeather.Storm)
 
         /* Then */
         assertEquals(Sun.Hidden, scene.sun)
@@ -158,7 +158,7 @@ class SkyWeatherTest {
     @Test
     fun `snow hides the sun`() {
         /* When */
-        val scene = skyScene(evening, westWindow, Weather.Snow)
+        val scene = skyScene(evening, westWindow, SkyWeather.Snow)
 
         /* Then */
         assertEquals(Sun.Hidden, scene.sun)
@@ -167,7 +167,7 @@ class SkyWeatherTest {
     @Test
     fun `clouds hide the light of a sun behind the viewer`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow, Weather.Cloudy)
+        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow, SkyWeather.Clouds)
 
         /* Then */
         assertEquals(Sun.Hidden, scene.sun)
@@ -176,7 +176,7 @@ class SkyWeatherTest {
     @Test
     fun `in warm weather a sun behind the viewer still lights the sky`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow, Weather.Warm)
+        val scene = skyScene(amsterdam(2026, 10, 25, 9, 0), westWindow, SkyWeather.Warm)
 
         /* Then */
         assertEquals(Sun.BehindViewer, scene.sun)
@@ -185,7 +185,7 @@ class SkyWeatherTest {
     @Test
     fun `at night rain leaves the sun below the horizon`() {
         /* When */
-        val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow, Weather.Rain)
+        val scene = skyScene(amsterdam(2026, 10, 25, 23, 0), westWindow, SkyWeather.Rain)
 
         /* Then */
         assertEquals(Sun.BelowHorizon, scene.sun)
@@ -204,6 +204,6 @@ class SkyWeatherTest {
 
         val evening: Instant = amsterdam(2026, 10, 25, 17, 5)
 
-        val clearEvening: SkyScene = skyScene(evening, westWindow, Weather.Clear)
+        val clearEvening: SkyScene = skyScene(evening, westWindow, SkyWeather.Clear)
     }
 }

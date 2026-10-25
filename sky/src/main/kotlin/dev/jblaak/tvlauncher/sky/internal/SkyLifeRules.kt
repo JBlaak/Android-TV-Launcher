@@ -1,7 +1,7 @@
 package dev.jblaak.tvlauncher.sky.internal
 
 import dev.jblaak.tvlauncher.sky.SkyLife
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import java.time.Instant
 import java.time.Month
 import java.time.ZoneOffset
@@ -13,12 +13,12 @@ import java.time.ZoneOffset
  * The month is taken in UTC: the window has no time zone, and around midnight, where UTC and local months can
  * differ, the sun is always far below −6° in Enschede, so the geese rule comes out the same.
  */
-internal fun skyLife(at: Instant, sunElevation: Double, weather: Weather): SkyLife = SkyLife(
-    shootingStars = weather in setOf(Weather.Clear, Weather.Warm) && sunElevation < -8,
+internal fun skyLife(at: Instant, sunElevation: Double, weather: SkyWeather): SkyLife = SkyLife(
+    shootingStars = weather in setOf(SkyWeather.Clear, SkyWeather.Warm) && sunElevation < -8,
     geese = at.atOffset(ZoneOffset.UTC).month in migrationMonths &&
         sunElevation > -6 &&
-        weather != Weather.Storm &&
-        weather != Weather.Fog,
+        weather != SkyWeather.Storm &&
+        weather != SkyWeather.Fog,
 )
 
 private val migrationMonths = setOf(Month.FEBRUARY, Month.MARCH, Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER)

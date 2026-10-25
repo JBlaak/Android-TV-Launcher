@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.unit.dp
 import dev.jblaak.tvlauncher.R
+import dev.jblaak.tvlauncher.sky.Moon
 import dev.jblaak.tvlauncher.sky.Sun
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -708,6 +709,61 @@ class HomeStateHolderTest {
     }
 
     @Test
+    fun `at 03 00 on 26 october the full moon stands high in the south-west`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 26, 3, 0)))
+
+        /* Then */
+        val moon = holder.state.value.moonDisc()
+        assertEquals(640.0 + (242 - 270) * 8, moon.position.x, 8.0)
+        assertEquals(600.0 - 39 * 8, moon.position.y, 8.0)
+    }
+
+    @Test
+    fun `at 03 00 on 26 october the moon is full`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 26, 3, 0)))
+
+        /* Then */
+        assertEquals(1.0, holder.state.value.moonDisc().phase.litFraction, 0.01)
+    }
+
+    @Test
+    fun `at 13 00 on 25 october there is no moon`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 13, 0)))
+
+        /* Then */
+        assertEquals(Moon.Hidden, holder.state.value.sky.moon)
+    }
+
+    @Test
+    fun `at 23 00 at midsummer the moon is about 42 percent lit`() {
+        /* When */
+        val holder = createHolder(clock = FakeClock(amsterdam(2026, 6, 21, 23, 0)))
+
+        /* Then */
+        assertEquals(0.42, holder.state.value.moonDisc().phase.litFraction, 0.02)
+    }
+
+    @Test
+    fun `the moon rises into view as the minutes pass`() = runTest {
+        /* Given */
+        val clock = FakeClock(amsterdam(2026, 10, 25, 12, 59, second = 30))
+        val holder = createHolder(clock = clock)
+        backgroundScope.launch { holder.keepTime() }
+        runCurrent()
+
+        /* When */
+        clock.time = amsterdam(2026, 10, 26, 3, 0)
+        advanceTimeBy(30.seconds)
+        runCurrent()
+
+        /* Then */
+        assertTrue(holder.state.value.sky.moon is Moon.Disc)
+    }
+
+    @Test
     fun `geese fly past on an october evening`() {
         /* When */
         val holder = createHolder(clock = FakeClock(amsterdam(2026, 10, 25, 17, 5)))
@@ -726,6 +782,8 @@ class HomeStateHolderTest {
     }
 
     private fun HomeState.sunDisc(): Sun.Disc = sky.sun as Sun.Disc
+
+    private fun HomeState.moonDisc(): Moon.Disc = sky.moon as Moon.Disc
 
     private fun assertAbout(expected: LocalTime, actual: LocalTime?) {
         val difference = Duration.between(expected, checkNotNull(actual)).abs()

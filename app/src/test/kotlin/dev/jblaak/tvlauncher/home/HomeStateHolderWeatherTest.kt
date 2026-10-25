@@ -1,7 +1,7 @@
 package dev.jblaak.tvlauncher.home
 
 import dev.jblaak.tvlauncher.R
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Wind
 import dev.jblaak.tvlauncher.sky.skyScene
 import dev.jblaak.tvlauncher.weather.CurrentWeather
@@ -36,7 +36,7 @@ class HomeStateHolderWeatherTest {
         val holder = createHolder(clock = FakeClock(at(17, 5)))
 
         /* Then */
-        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, Weather.Clear), holder.state.value.sky)
+        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, SkyWeather.Clear), holder.state.value.sky)
     }
 
     @Test
@@ -79,7 +79,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `the pill shows temperatures below zero`() = runTest {
         /* Given */
-        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Snow, temperature = -2.4))))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Snow, temperature = -2.4))))
 
         /* When */
         keepWeather(holder)
@@ -98,7 +98,7 @@ class HomeStateHolderWeatherTest {
         keepWeather(holder)
 
         /* Then */
-        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, Weather.Rain), holder.state.value.sky)
+        assertEquals(skyScene(at(17, 5).toInstant(), HomeConfig.Enschede.window, SkyWeather.Rain), holder.state.value.sky)
     }
 
     @Test
@@ -234,7 +234,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `a clear day shows the sun and says sunny`() = runTest {
         /* Given */
-        val holder = createHolder(clock = FakeClock(at(12, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Clear))))
+        val holder = createHolder(clock = FakeClock(at(12, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Clear))))
 
         /* When */
         keepWeather(holder)
@@ -246,7 +246,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `a warm day says sunny too`() = runTest {
         /* Given */
-        val holder = createHolder(clock = FakeClock(at(12, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Warm))))
+        val holder = createHolder(clock = FakeClock(at(12, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Warm))))
 
         /* When */
         keepWeather(holder)
@@ -258,7 +258,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `a warm night shows the moon and says warm`() = runTest {
         /* Given */
-        val holder = createHolder(clock = FakeClock(at(23, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Warm))))
+        val holder = createHolder(clock = FakeClock(at(23, 0)), weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Warm))))
 
         /* When */
         keepWeather(holder)
@@ -270,7 +270,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `cloudy weather shows clouds`() = runTest {
         /* Given */
-        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Cloudy))))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Clouds))))
 
         /* When */
         keepWeather(holder)
@@ -282,7 +282,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `a storm shows lightning`() = runTest {
         /* Given */
-        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Storm))))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Storm))))
 
         /* When */
         keepWeather(holder)
@@ -294,7 +294,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `snow shows snowflakes`() = runTest {
         /* Given */
-        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Snow))))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Snow))))
 
         /* When */
         keepWeather(holder)
@@ -306,7 +306,7 @@ class HomeStateHolderWeatherTest {
     @Test
     fun `fog shows fog`() = runTest {
         /* Given */
-        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = Weather.Fog))))
+        val holder = createHolder(weatherSource = FakeWeatherSource(fetched(rain.copy(weather = SkyWeather.Fog))))
 
         /* When */
         keepWeather(holder)
@@ -339,6 +339,6 @@ class HomeStateHolderWeatherTest {
     )
 
     private companion object {
-        val rain = CurrentWeather(weather = Weather.Rain, temperature = 9.4, wind = Wind(from = 225.0, speed = 20.0, gusts = 35.0))
+        val rain = CurrentWeather(weather = SkyWeather.Rain, temperature = 9.4, wind = Wind(from = 225.0, speed = 20.0, gusts = 35.0))
     }
 }

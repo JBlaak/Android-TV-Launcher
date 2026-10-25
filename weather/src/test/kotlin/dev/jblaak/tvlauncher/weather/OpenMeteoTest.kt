@@ -1,7 +1,7 @@
 package dev.jblaak.tvlauncher.weather
 
 import dev.jblaak.tvlauncher.sky.Location
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Wind
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -74,7 +74,7 @@ class OpenMeteoTest {
         val weather = weatherFor(0, 1)
 
         /* Then */
-        assertEquals(listOf(Weather.Clear, Weather.Clear), weather)
+        assertEquals(listOf(SkyWeather.Clear, SkyWeather.Clear), weather)
     }
 
     @Test
@@ -83,7 +83,7 @@ class OpenMeteoTest {
         val weather = weatherFor(0, 1, temperature = 25.0)
 
         /* Then */
-        assertEquals(listOf(Weather.Warm, Weather.Warm), weather)
+        assertEquals(listOf(SkyWeather.Warm, SkyWeather.Warm), weather)
     }
 
     @Test
@@ -92,7 +92,7 @@ class OpenMeteoTest {
         val weather = weatherFor(0, temperature = 24.9)
 
         /* Then */
-        assertEquals(listOf(Weather.Clear), weather)
+        assertEquals(listOf(SkyWeather.Clear), weather)
     }
 
     @Test
@@ -101,7 +101,7 @@ class OpenMeteoTest {
         val weather = weatherFor(2, 3)
 
         /* Then */
-        assertEquals(listOf(Weather.Cloudy, Weather.Cloudy), weather)
+        assertEquals(listOf(SkyWeather.Clouds, SkyWeather.Clouds), weather)
     }
 
     @Test
@@ -110,7 +110,7 @@ class OpenMeteoTest {
         val weather = weatherFor(3, temperature = 30.0)
 
         /* Then */
-        assertEquals(listOf(Weather.Cloudy), weather)
+        assertEquals(listOf(SkyWeather.Clouds), weather)
     }
 
     @Test
@@ -119,7 +119,7 @@ class OpenMeteoTest {
         val weather = weatherFor(45, 48)
 
         /* Then */
-        assertEquals(listOf(Weather.Fog, Weather.Fog), weather)
+        assertEquals(listOf(SkyWeather.Fog, SkyWeather.Fog), weather)
     }
 
     @Test
@@ -128,7 +128,7 @@ class OpenMeteoTest {
         val weather = weatherFor(51, 53, 55, 56, 57)
 
         /* Then */
-        assertEquals(List(5) { Weather.Rain }, weather)
+        assertEquals(List(5) { SkyWeather.Rain }, weather)
     }
 
     @Test
@@ -137,7 +137,7 @@ class OpenMeteoTest {
         val weather = weatherFor(61, 63, 65, 66, 67)
 
         /* Then */
-        assertEquals(List(5) { Weather.Rain }, weather)
+        assertEquals(List(5) { SkyWeather.Rain }, weather)
     }
 
     @Test
@@ -146,7 +146,7 @@ class OpenMeteoTest {
         val weather = weatherFor(80, 81, 82)
 
         /* Then */
-        assertEquals(List(3) { Weather.Rain }, weather)
+        assertEquals(List(3) { SkyWeather.Rain }, weather)
     }
 
     @Test
@@ -155,7 +155,7 @@ class OpenMeteoTest {
         val weather = weatherFor(71, 73, 75, 77)
 
         /* Then */
-        assertEquals(List(4) { Weather.Snow }, weather)
+        assertEquals(List(4) { SkyWeather.Snow }, weather)
     }
 
     @Test
@@ -164,7 +164,7 @@ class OpenMeteoTest {
         val weather = weatherFor(85, 86)
 
         /* Then */
-        assertEquals(List(2) { Weather.Snow }, weather)
+        assertEquals(List(2) { SkyWeather.Snow }, weather)
     }
 
     @Test
@@ -173,7 +173,7 @@ class OpenMeteoTest {
         val weather = weatherFor(95, 96, 99)
 
         /* Then */
-        assertEquals(List(3) { Weather.Storm }, weather)
+        assertEquals(List(3) { SkyWeather.Storm }, weather)
     }
 
     @Test
@@ -182,7 +182,7 @@ class OpenMeteoTest {
         val weather = weatherFor(42)
 
         /* Then */
-        assertEquals(listOf(Weather.Clear), weather)
+        assertEquals(listOf(SkyWeather.Clear), weather)
     }
 
     @Test
@@ -260,7 +260,7 @@ class OpenMeteoTest {
         assertEquals(WeatherFetch.Failed, fetch)
     }
 
-    private suspend fun weatherFor(vararg codes: Int, temperature: Double = 12.0): List<Weather> = codes.map { code ->
+    private suspend fun weatherFor(vararg codes: Int, temperature: Double = 12.0): List<SkyWeather> = codes.map { code ->
         val json = canned("current_rain.json")
             .replace("\"weather_code\":61", "\"weather_code\":$code")
             .replace("\"temperature_2m\":9.4", "\"temperature_2m\":$temperature")

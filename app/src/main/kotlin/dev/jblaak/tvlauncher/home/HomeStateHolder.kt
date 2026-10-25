@@ -3,9 +3,9 @@ package dev.jblaak.tvlauncher.home
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.Moment
 import dev.jblaak.tvlauncher.sky.SkyScene
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Sun
 import dev.jblaak.tvlauncher.sky.SunEvent
-import dev.jblaak.tvlauncher.sky.Weather
 import dev.jblaak.tvlauncher.sky.moment
 import dev.jblaak.tvlauncher.sky.nextSunEvent
 import dev.jblaak.tvlauncher.sky.skyScene
@@ -104,7 +104,7 @@ internal class HomeStateHolder(
     }
 
     private fun HomeState.withWeather(now: ZonedDateTime): HomeState {
-        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: Weather.Clear)
+        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
         return copy(sky = sky, weather = pillWeather(sky))
     }
 
@@ -118,14 +118,14 @@ internal class HomeStateHolder(
     private fun pillWeather(sky: SkyScene): PillWeather {
         val current = liveWeather()?.current
         val sunUp = sky.sun != Sun.BelowHorizon
-        val (icon, condition) = when (current?.weather ?: Weather.Clear) {
-            Weather.Clear -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.clear
-            Weather.Warm -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.warm
-            Weather.Cloudy -> R.drawable.ic_weather_cloudy to R.string.cloudy
-            Weather.Rain -> R.drawable.ic_weather_rain to R.string.rain
-            Weather.Storm -> R.drawable.ic_weather_storm to R.string.storm
-            Weather.Snow -> R.drawable.ic_weather_snow to R.string.snow
-            Weather.Fog -> R.drawable.ic_weather_fog to R.string.fog
+        val (icon, condition) = when (current?.weather ?: SkyWeather.Clear) {
+            SkyWeather.Clear -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.clear
+            SkyWeather.Warm -> if (sunUp) R.drawable.ic_weather_sun to R.string.sunny else R.drawable.ic_weather_moon to R.string.warm
+            SkyWeather.Clouds -> R.drawable.ic_weather_cloudy to R.string.cloudy
+            SkyWeather.Rain -> R.drawable.ic_weather_rain to R.string.rain
+            SkyWeather.Storm -> R.drawable.ic_weather_storm to R.string.storm
+            SkyWeather.Snow -> R.drawable.ic_weather_snow to R.string.snow
+            SkyWeather.Fog -> R.drawable.ic_weather_fog to R.string.fog
         }
         return PillWeather(icon = icon, condition = condition, temperature = current?.temperature?.roundToInt())
     }
@@ -135,7 +135,7 @@ internal class HomeStateHolder(
         val lastOpened = lastOpenedApp.get()
         val focused = tiles.firstOrNull { it.app == lastOpened } ?: tiles.firstOrNull()
         val now = clock.now()
-        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: Weather.Clear)
+        val sky = skyScene(now.toInstant(), config.window, liveWeather()?.current?.weather ?: SkyWeather.Clear)
         return HomeState(
             tiles = tiles,
             focused = focused?.app,

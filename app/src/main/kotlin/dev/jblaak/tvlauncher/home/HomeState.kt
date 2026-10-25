@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Dp
 import dev.jblaak.tvlauncher.R
 import dev.jblaak.tvlauncher.sky.SkyScene
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Wind
 import dev.jblaak.tvlauncher.weather.CurrentWeather
 import dev.jblaak.tvlauncher.weather.WeatherFetch
@@ -40,17 +40,17 @@ internal data class HomeState(
         }
 
     companion object {
-        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
+        val previewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
 
-        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 23, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
+        val nightPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 26, 3, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
 
-        val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Rain)
+        val rainPreviewValue: HomeState = preview(ZonedDateTime.of(2026, 10, 25, 17, 5, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Rain)
 
-        val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
+        val newYearsEvePreviewValue: HomeState = preview(ZonedDateTime.of(2026, 12, 31, 23, 30, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
 
-        val kingsDayPreviewValue: HomeState = preview(ZonedDateTime.of(2027, 4, 27, 14, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), Weather.Clear)
+        val kingsDayPreviewValue: HomeState = preview(ZonedDateTime.of(2027, 4, 27, 14, 0, 0, 0, ZoneId.of("Europe/Amsterdam")), SkyWeather.Clear)
 
-        private fun preview(time: ZonedDateTime, weather: Weather): HomeState = HomeStateHolder(
+        private fun preview(time: ZonedDateTime, weather: SkyWeather): HomeState = HomeStateHolder(
             config = HomeConfig.Enschede,
             installedApps = object : InstalledApps {
                 override fun isInstalled(packageName: String): Boolean = true

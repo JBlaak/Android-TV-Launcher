@@ -1,6 +1,6 @@
 package dev.jblaak.tvlauncher.weather.internal
 
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Wind
 import dev.jblaak.tvlauncher.weather.CurrentWeather
 import kotlinx.serialization.SerialName
@@ -27,13 +27,13 @@ internal fun OpenMeteoForecast.toCurrentWeather(): CurrentWeather = CurrentWeath
 )
 
 /**
- * WMO weather interpretation codes as Open-Meteo documents them. A clear sky from 25 °C is [Weather.Warm].
+ * WMO weather interpretation codes as Open-Meteo documents them. A clear sky from 25 °C is [SkyWeather.Warm].
  */
-private fun weather(code: Int, temperature: Double): Weather = when (code) {
-    2, 3 -> Weather.Cloudy
-    45, 48 -> Weather.Fog
-    in 51..67, in 80..82 -> Weather.Rain
-    in 71..77, 85, 86 -> Weather.Snow
-    in 95..99 -> Weather.Storm
-    else -> if (temperature >= 25) Weather.Warm else Weather.Clear
+private fun weather(code: Int, temperature: Double): SkyWeather = when (code) {
+    2, 3 -> SkyWeather.Clouds
+    45, 48 -> SkyWeather.Fog
+    in 51..67, in 80..82 -> SkyWeather.Rain
+    in 71..77, 85, 86 -> SkyWeather.Snow
+    in 95..99 -> SkyWeather.Storm
+    else -> if (temperature >= 25) SkyWeather.Warm else SkyWeather.Clear
 }

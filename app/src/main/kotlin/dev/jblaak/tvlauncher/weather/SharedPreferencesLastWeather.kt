@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import dev.jblaak.tvlauncher.home.FetchedWeather
 import dev.jblaak.tvlauncher.home.LastWeather
-import dev.jblaak.tvlauncher.sky.Weather
+import dev.jblaak.tvlauncher.sky.SkyWeather
 import dev.jblaak.tvlauncher.sky.Wind
 import java.time.Instant
 
@@ -13,7 +13,7 @@ internal class SharedPreferencesLastWeather(
 ) : LastWeather {
 
     override fun get(): FetchedWeather? {
-        val weather = Weather.entries.firstOrNull { it.name == preferences.getString("weather", null) } ?: return null
+        val weather = SkyWeather.entries.firstOrNull { it.name == preferences.getString("weather", null) } ?: return null
         return FetchedWeather(
             current = CurrentWeather(
                 weather = weather,
