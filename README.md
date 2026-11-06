@@ -64,6 +64,22 @@ keyPassword=...
 To keep the file somewhere else, set `tvlauncher.signing=/path/to/signing.properties` in
 `~/.gradle/gradle.properties`. Keep the keystore and the properties file out of the repository.
 
+The maintainer's release key lives in 1Password: item **Android TV Launcher release signing key** in the **Private**
+vault of the personal account (`my.1password.com`). It holds `release.jks` and `signing.properties` as attachments,
+plus the passwords and alias as fields. To restore it on a new machine:
+
+```sh
+mkdir -m 700 -p ~/.android-tv-launcher
+for file in release.jks signing.properties; do
+  op read --account my.1password.com --out-file ~/.android-tv-launcher/$file \
+    "op://Private/Android TV Launcher release signing key/$file"
+done
+chmod 600 ~/.android-tv-launcher/*
+```
+
+`signing.properties` points `storeFile` at `/Users/jorisblaak/.android-tv-launcher/release.jks`; edit it if your home
+directory differs.
+
 ## Install over adb
 
 Turn on developer options and network debugging on the TV, then connect to it with `adb connect <tv-ip>:5555`. With
